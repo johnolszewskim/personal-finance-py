@@ -35,11 +35,12 @@ class TransactionWizard(tk.Frame):
         return b_f
 
     def next_clicked(self):
-        self.t_frame.grid_remove()
-        self.t_index += 1
-        self.t_frame = self.t_frame_deck[self.t_index]
-        self.t_frame.grid(row=0, column=0)
-        self.delete_checkbutton_var.set(self.t_frame.delete)
+        if self.t_index < len(self.t_frame_deck)-1:
+            self.t_frame.grid_remove()
+            self.t_index += 1
+            self.t_frame = self.t_frame_deck[self.t_index]
+            self.t_frame.grid(row=0, column=0)
+            self.delete_checkbutton_var.set(self.t_frame.delete)
 
     def split_clicked(self):
         if self.delete_checkbutton_var.get() == 0:

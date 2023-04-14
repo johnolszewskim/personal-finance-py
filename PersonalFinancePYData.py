@@ -8,6 +8,23 @@ chase_col_map = {
 	'Amount' : 'Amount'
 }
 
+transaction_column_map = {
+	'Transaction ID': 'test',
+	'Statement ID': 'test',
+	'Date': {
+		'Chase': 'Transaction Date',
+		'American Express': 'Date'
+	},
+	'Vendor': {
+		'Chase': 'Description',
+		'American Express': 'Description'
+	},
+	'Amount': {
+		'Chase': 'Amount',
+		'American Express': 'Amount'
+	},
+}
+
 account_lookup = {
 	'3387': 'Freedom Unlimited',
 	'06003': 'Bonvoy Brilliant',
@@ -74,14 +91,11 @@ df_resources = pd.DataFrame
 
 def import_resources(resources):
 	df_resources = resources
-
 	directory = df_resources.loc['directory']['LOCATION']
-
 	transactions_SAVED = pd.read_csv(directory + df_resources.loc['transactions']['LOCATION'])
-	print(transactions_SAVED)
-
+	print("transactions loaded.")
 	budgets_transactions_SAVED = pd.read_csv(directory + df_resources.loc['budget_transactions']['LOCATION'])
-	print(budgets_transactions_SAVED)
+	print("budget_transactions loaded.")
 
 
 
