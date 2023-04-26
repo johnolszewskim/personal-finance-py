@@ -5,57 +5,87 @@ import SingleBudgetLineFrame as sblf
 import SingleTransactionLineFrame as stlf
 
 class TransactionWizard(tk.Frame):
+    # indices variable for ease of moving widgets without having to type every column value
+    indices = ['index_Prev',
+               'index_Split',
+               'index_Next',
+               'index_Delete',
+               'index_Delete_Checkbutton',
+               'index_StatementName',
+               'index_Save']
 
-    def __init__(self, master, trans):
+    def __init__(self, master, transactions, filename):
 
         tk.Frame.__init__(self, master)
 
-        self.trans = trans
-        self.delete_checkbutton_var = tk.IntVar()
-        self.t_index = 0
+        self.imported_transactions=transactions
+
+        self.current_index = 0
+
+        self.statement_name = tk.StringVar()
 
         self.t_frame_deck = []
-        for t in trans.iloc():
+        for t in self.imported_transactions.iloc():
             self.t_frame_deck.append(stlf.SingleTransactionLineFrame(self, t, 'lightgray'))
 
-        self.t_frame = self.t_frame_deck[self.t_index]
-        self.t_frame.grid(row=0, column=0)
+        self.current_t_frame = self.t_frame_deck[self.current_index]
+        self.current_t_frame.grid(row=0, column=0)
 
-        self.b_frame = self.buttons().grid(row=1, column=0, stick='w')
-        self.buttons()
+        self.delete_cb = tk.Checkbutton
+        self.button_frame = self.create_button_frame().grid(row=1, column=0, stick='w')
 
-    def buttons(self) -> tk.Frame:
+    def create_button_frame(self) -> tk.Frame:
         b_f = tk.Frame(self.master)
-        tk.Button(b_f, text='Prev', command=self.prev_clicked).grid(row=0, column=0)
-        tk.Button(b_f, text='Split', command=self.split_clicked).grid(row=0, column=1)
-        tk.Button(b_f, text='Next', command=self.next_clicked).grid(row=0, column=2)
-        tk.Label(b_f, text='Delete').grid(row=0, column=3)
-        tk.Checkbutton(b_f, command=self.delete_checkbutton_clicked, variable=self.delete_checkbutton_var, onvalue=1, offvalue=0).grid(row=0, column=4)
-        tk.Button(b_f, text='Save', command=self.save).grid(row=0, column=5, sticky='e')
+
+        tk.Button(b_f, text='Prev', command=self.prev_clicked).grid(row=0, column=TransactionWizard.indices.index('index_Prev'))
+        tk.Button(b_f, text='Split', command=self.split_clicked).grid(row=0, column=TransactionWizard.indices.index('index_Split'))
+        tk.Button(b_f, text='Next', command=self.next_clicked).grid(row=0, column=TransactionWizard.indices.index('index_Next'))
+        tk.Label(b_f, text='Delete').grid(row=0, column=TransactionWizard.indices.index('index_Delete'))
+
+        self.delete_cb = tk.Checkbutton(b_f, command=self.delete_checkbutton_clicked, variable=self.current_t_frame.delete_var.get(), onvalue=1, offvalue=0)
+        self.delete_cb.grid(row=0, column=TransactionWizard.indices.index('index_Delete_Checkbutton'))
+        print(self.current_t_frame.delete_var.get())
+
+        # TODO // Set default text to filename
+        tk.Entry(b_f, width=50, textvariable=self.statement_name).grid(row=0, column=TransactionWizard.indices.index('index_StatementName'))
+        tk.Button(b_f, text='Save', command=self.save).grid(row=0, column=TransactionWizard.indices.index('index_Save'), sticky='e')
         return b_f
 
     def next_clicked(self):
-        if self.t_index < len(self.t_frame_deck)-1:
-            self.t_frame.grid_remove()
-            self.t_index += 1
-            self.t_frame = self.t_frame_deck[self.t_index]
-            self.t_frame.grid(row=0, column=0)
-            self.delete_checkbutton_var.set(self.t_frame.delete)
+        if self.current_index < len(self.t_frame_deck)-1:
+            self.current_t_frame.grid_remove()
+            self.current_index += 1
+            self.current_t_frame = self.t_frame_deck[self.current_index]
+            self.current_t_frame.grid(row=0, column=0)
+            if self.current_t_frame.delete_var.get() == 1:
+                self.delete_cb.select()
+            else:
+                self.delete_cb.deselect()
+            print(self.current_t_frame.delete_var.get())
 
     def split_clicked(self):
-        if self.delete_checkbutton_var.get() == 0:
-            self.t_frame.add_budget_line_frame()
+        if self.current_t_frame.delete_var.get() == 0:
+            self.current_t_frame.add_budget_line_frame()
 
     def prev_clicked(self):
-        if self.t_index > 0:
-            self.t_frame.grid_remove()
-            self.t_index -= 1
-            self.t_frame = self.t_frame_deck[self.t_index]
-            self.t_frame.grid(row=0, column=0)
-            self.delete_checkbutton_var.set(self.t_frame.delete)
+        if self.current_index > 0:
+            self.current_t_frame.grid_remove()
+            self.current_index -= 1
+            self.current_t_frame = self.t_frame_deck[self.current_index]
+            self.current_t_frame.grid(row=0, column=0)
+            if self.current_t_frame.delete_var.get() == 1:
+                self.delete_cb.select()
+            else:
+                self.delete_cb.deselect()
 
     def delete_checkbutton_clicked(self):
-        self.t_frame.match_checkbutton(self.delete_checkbutton_var.get())
+        if self.current_t_frame.delete_var.get() == 0:
+            self.current_t_frame.delete_var.set(1)
+        else:
+            self.current_t_frame.delete_var.set(0)
+
+        self.current_t_frame.match_checkbutton()
+        # # TODO checkbox matching rotating through frames
 
     def save(self):
         for t_f in self.t_frame_deck:

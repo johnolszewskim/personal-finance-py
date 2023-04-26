@@ -49,9 +49,39 @@ category_lookup = {
 	'Subscriptions' : ['iCloud', 'Streaming Services', 'Amazon Prime']
 }
 
-vendor_lookup = {
-	'APPLE.COM/BILL' : 'Apple.com',
-}
+transactions_SAVED = pd.DataFrame
+budget_transactions_SAVED = pd.DataFrame
+df_resources = pd.DataFrame
+def import_resources():
+
+	directory = df_resources.loc['directory']['LOCATION']
+	transactions_SAVED = pd.read_csv(directory + df_resources.loc['transactions']['LOCATION'])
+	print("transactions loaded.")
+	budgets_transactions_SAVED = pd.read_csv(directory + df_resources.loc['budget_transactions']['LOCATION'])
+	print("budget_transactions loaded.")
+
+def lookup_vendor(vendor) -> str:
+
+	vendors = {
+		'APPLE.COM/BILL' : 'Apple.com',
+	}
+
+	if vendor in vendors:
+		return vendors[vendor]
+	else:
+		return vendor
+def match_vendor_category(vendor) -> str:
+
+	vendor_category = {
+		'Apple.com' : 'Subscriptions'
+	}
+
+	if vendor in vendor_category:
+		return vendor_category[vendor]
+	else:
+		return ""
+
+
 
 budget_col_names = ["Transaction ID", "Vendor", "Category", "Subcategory", "Amount", "Tag", "Notes"]
 master_budget_lines = pd.DataFrame(columns=budget_col_names)
@@ -84,18 +114,10 @@ def add_budget_line(trans_ID, vendor, category, subcategory, amount):
 		'Amount': amount
 	}
 
-transactions_SAVED = pd.DataFrame
-budget_transactions_SAVED = pd.DataFrame
-df_resources = pd.DataFrame
 
 
-def import_resources(resources):
-	df_resources = resources
-	directory = df_resources.loc['directory']['LOCATION']
-	transactions_SAVED = pd.read_csv(directory + df_resources.loc['transactions']['LOCATION'])
-	print("transactions loaded.")
-	budgets_transactions_SAVED = pd.read_csv(directory + df_resources.loc['budget_transactions']['LOCATION'])
-	print("budget_transactions loaded.")
+
+
 
 
 

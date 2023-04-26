@@ -10,12 +10,12 @@ import SingleTransactionLineFrame
 import TransactionWizard as tw
 
 class PersonalFinancePYGUI(tk.Frame):
-	def __init__(self, master, df_transactions, df_budget_transactions):
+	def __init__(self, master, df_all_transactions, df_all_budget_transactions):
 
 		tk.Frame.__init__(self, master)
 
-		self.df_transactions = df_transactions
-		self.df_budget_transactions = df_budget_transactions
+		self.df_all_transactions = df_all_transactions
+		self.df_all_budget_transactions = df_all_budget_transactions
 
 		self.resources_label = self.make_resources_label()
 		self.transactions_label = self.make_transactions_label()
@@ -47,9 +47,11 @@ class PersonalFinancePYGUI(tk.Frame):
 	def make_load_transactions_row(self) -> tk.StringVar:
 		banks = ['Chase', 'American Express', 'Bank of America', 'Citi']
 		bank_selection = tk.StringVar()
-		ttk.Combobox(self, values=banks, textvariable=bank_selection).grid(row=6, column=0)
+		bank_combobox = ttk.Combobox(self, values=banks, textvariable=bank_selection)
+		bank_combobox.grid(row=6, column=0)
+		bank_combobox.current(0)
 
-		tk.Button(self, text='load transactions', command=self.startTransactionWizard).grid(row=6, column=1)
+		tk.Button(self, text='Load transactions', command=self.startTransactionWizard).grid(row=6, column=1)
 
 		return bank_selection
 
@@ -59,24 +61,14 @@ class PersonalFinancePYGUI(tk.Frame):
 		import_trans = pd.read_csv(new_transactions_file)
 
 		# print(data.transaction_column_map['Date'][self.bank.get()])
-		trans = pd.DataFrame(columns=data.transaction_column_map.keys())
-		trans['Date'] = import_trans[data.transaction_column_map['Date'][self.bank.get()]]
-		trans['Vendor'] = import_trans[data.transaction_column_map['Vendor'][self.bank.get()]]
-		trans['Amount'] = import_trans[data.transaction_column_map['Amount'][self.bank.get()]]
+		imported_transactions = pd.DataFrame(columns=data.transaction_column_map.keys())
+		imported_transactions['Date'] = import_trans[data.transaction_column_map['Date'][self.bank.get()]]
+		imported_transactions['Vendor'] = import_trans[data.transaction_column_map['Vendor'][self.bank.get()]]
+		imported_transactions['Amount'] = import_trans[data.transaction_column_map['Amount'][self.bank.get()]]
 
-		root = tk.Tk()
-		root.title("Transaction Wizard")
+		t = tk.Tk()
+		t.title("Transaction Wizard")
 
-		transaction_wizard = tw.TransactionWizard(root, trans).grid(row=0, column=0)
+		transaction_wizard = tw.TransactionWizard(t, imported_transactions, new_transactions_file).grid(row=0, column=0)
 
-		root.mainloop()
-
-
-def startTransactionWizard(transactions) -> pd.DataFrame:
-
-	root = tk.Tk()
-	root.title("Transaction Wizard")
-
-	transaction_wizard = tw.TransactionWizard(root, transactions).grid(row=0, column=0)
-
-	root.mainloop()
+		# t.mainloop()

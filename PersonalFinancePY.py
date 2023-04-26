@@ -7,17 +7,15 @@ import PersonalFinancePYGUI as GUI
 
 app_directory = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/'
 resources_filename = 'RESOURCES_PersonalFinancePY.csv'
-print("Loading from: " + app_directory)
-resources = pd.read_csv(app_directory + resources_filename, index_col=0)
-data.import_resources(resources)
+print("Loading from: " + app_directory + resources_filename)
+data.df_resources = pd.read_csv(app_directory + resources_filename, index_col=0)
+data.import_resources()
 
 root = tk.Tk()
 root.title("Personal Finance PY")
 gui = GUI.PersonalFinancePYGUI(root, data.transactions_SAVED, data.budget_transactions_SAVED)
 gui.grid(row=0, column=0)
 root.mainloop()
-
-# GUI.startGUI()
 
 imported = pd.read_csv('transactions.csv')
 statement_id = '3387_20230108'

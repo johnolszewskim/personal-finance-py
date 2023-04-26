@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+
+import pandas as pd
+
 import PersonalFinancePYData as data
 
 class SingleBudgetLineFrame(tk.Frame):
@@ -12,12 +15,13 @@ class SingleBudgetLineFrame(tk.Frame):
         self.master = master
 
         self.vendor_entry = self.createVendorEntry()
-        self.vendor_entry[0].insert(0, self.vendor_lookup(trans['Vendor']))
+        self.vendor_entry[0].insert(0, data.lookup_vendor(trans['Vendor']))
+        self.vendor_entry[1].set(self.vendor_entry[0].get())
 
         self.category_combo = self.createCategoryCombo()
         self.subcategory_combo = self.createSubcategoryCombo()
         self.category_combo[0].bind("<<ComboboxSelected>>",
-                                    lambda _: self.category_selected(self.category_combo[1].get(), self.subcategory_combo[0]))
+                                    lambda _: self.category_selected())
 
         self.amount_entry = self.createAmountEntry()
         self.amount_entry[0].insert(0, str(trans['Amount']))
@@ -30,17 +34,14 @@ class SingleBudgetLineFrame(tk.Frame):
         vendor_entry.grid(row=1, column=0, sticky='w')
         return (vendor_entry, entered_vendor)
 
-    def vendor_lookup(self, vend):
-        if vend in data.vendor_lookup:
-            return data.vendor_lookup[vend]
-        else:
-            return vend
-
     def createCategoryCombo(self) -> (ttk.Combobox, tk.StringVar):
         categories = [key for key in data.category_lookup.keys()]
         selected_category = tk.StringVar()
+        selected_category.set('test')
         category_combobox = ttk.Combobox(self, values=categories, textvariable=selected_category)
         category_combobox.grid(row=1, column=1, sticky='w')
+        # category_combobox.set('test')
+        print(selected_category.get())
         return (category_combobox, selected_category)
 
 
@@ -51,9 +52,13 @@ class SingleBudgetLineFrame(tk.Frame):
         return (subcategory_combobox, selected_subcategory)
 
 
-    def category_selected(self, category_str, subcategory_combo):
-        subcategory_combo.configure(values=data.category_lookup[category_str])
+    def category_selected(self):
 
+        self.category_combo[1].set(self.category_combo[0].get())
+        self.subcategory_combo[0].configure(values=data.category_lookup[self.category_combo[1].get()])
+        self.subcategory_combo[0].current(0)
+        self.subcategory_combo[1].set(self.subcategory_combo[0].get())
+        # self.subcategory_combo[1].set(self.subcategory_combo(0).get())
 
     def createAmountEntry(self) -> (tk.Entry, tk.StringVar):
         entered_amount = tk.StringVar()
@@ -84,9 +89,13 @@ class SingleBudgetLineFrame(tk.Frame):
         self.amount_entry[0].configure(state=state)
         self.delete_button.configure(state=state)
 
-    def save(self):
-        data.add_budget_line(trans_ID=self.trans['Transaction ID'],
-                             vendor=self.vendor_entry[1].get(),
-                             category=self.category_combo[1].get(),
-                             subcategory=self.subcategory_combo[1].get(),
-                             amount=self.amount_entry[1].get())
+    def save(self, df_transaction):
+
+        df_transaction['Vendor'] = [self.vendor_entry[1].get()]
+        df_transaction['Category'] = [self.category_combo[1].get()]
+        df_transaction['Subcategory'] = [self.subcategory_combo[1].get()]
+        df_transaction['Amount'] = [self.amount_entry[1].get()]
+
+    def validate(self):
+        x=0
+        # print('test')
