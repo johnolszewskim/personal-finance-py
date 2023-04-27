@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import simpledialog as sd
 from tkinter import ttk
+import Transaction as tx
 
 import pandas as pd
 
 import PersonalFinancePYData as data
-import SingleTransactionLineFrame
+import SingleTransactionFrame
 import TransactionWizard as tw
 
 class PersonalFinancePYGUI(tk.Frame):
@@ -58,17 +59,20 @@ class PersonalFinancePYGUI(tk.Frame):
 	def startTransactionWizard(self):
 
 		new_transactions_file = fd.askopenfilename()
-		import_trans = pd.read_csv(new_transactions_file)
+		statement_id = input('Statement ID: ')
+		imported_trans = pd.read_csv(new_transactions_file)
 
-		# print(data.transaction_column_map['Date'][self.bank.get()])
-		imported_transactions = pd.DataFrame(columns=data.transaction_column_map.keys())
-		imported_transactions['Date'] = import_trans[data.transaction_column_map['Date'][self.bank.get()]]
-		imported_transactions['Vendor'] = import_trans[data.transaction_column_map['Vendor'][self.bank.get()]]
-		imported_transactions['Amount'] = import_trans[data.transaction_column_map['Amount'][self.bank.get()]]
+		new_transactions = pd.DataFrame(columns=data.transaction_column_map.keys())
 
+		new_transactions['Date'] = imported_trans[data.transaction_column_map['Date'][self.bank.get()]]
+		new_transactions['Vendor'] = imported_trans[data.transaction_column_map['Vendor'][self.bank.get()]]
+		new_transactions['Amount'] = imported_trans[data.transaction_column_map['Amount'][self.bank.get()]]
+		new_transactions['Transaction ID'] = new_transactions.index
+		new_transactions['Statement ID'] = statement_id
+		new_transactions.set_index('Transaction ID')
 		t = tk.Tk()
 		t.title("Transaction Wizard")
 
-		transaction_wizard = tw.TransactionWizard(t, imported_transactions, new_transactions_file).grid(row=0, column=0)
+		transaction_wizard = tw.TransactionWizard(t, new_transactions, statement_id).grid(row=0, column=0)
 
 		# t.mainloop()
