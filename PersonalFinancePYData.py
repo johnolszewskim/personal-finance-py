@@ -1,6 +1,13 @@
 import pandas as pd
-import os
+from bs4 import BeautifulSoup
 import PersonalFinancePYGUI as gui
+
+VENDORS_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/VENDORS_PersonalFinancePY.xml'
+with open(VENDORS_FILE, 'r') as f:
+    data = f.read()
+bs_data = BeautifulSoup(data, 'xml')
+bs_vendors = bs_data.find_all('vendor')
+
 
 chase_col_map = {
 	'Transaction Date' : 'Date',
@@ -41,7 +48,7 @@ category_lookup = {
 	'Recreation' : ['Membership Fees', 'Skiing', 'Cycling', 'Camping', 'Scuba Diving', 'Nutrition', 'Running', 'Outdoor Gear'],
 	'Alcohol' : ['Bar/Brewery', 'Liquor Store'],
 	'Education' : ['Books/Supplies'],
-	'Groceries' : ['Groceries', 'Snacks', 'Meal Prep'],
+	'Groceries' : ['Regular Groceries', 'Snacks', 'Meal Prep'],
 	'Mosi' : ['Boarding', 'Gear/Supplies', 'Veterinary', 'Wag!', 'Food', 'Grooming'],
 	'Personal Care' : ['Toiletries', 'Therapy', 'Medicine/Prescriptions', 'Haircuts'],
 	'Public Transportation' : ['Rideshare', 'Parking'],
@@ -60,11 +67,11 @@ def import_resources():
 	budgets_transactions_SAVED = pd.read_csv(directory + df_resources.loc['budget_transactions']['LOCATION'])
 	print("budget_transactions loaded.")
 
-def lookup_vendor(vendor) -> str:
-
-	vendors = {
+vendors = {
 		'APPLE.COM/BILL' : 'Apple.com',
+		'UBER' : 'Uber'
 	}
+def lookup_vendor(vendor) -> str:
 
 	if vendor in vendors:
 		return vendors[vendor]
@@ -86,7 +93,7 @@ def match_vendor_category(vendor) -> str:
 budget_col_names = ["Transaction ID", "Vendor", "Category", "Subcategory", "Amount", "Tag", "Notes"]
 master_budget_lines = pd.DataFrame(columns=budget_col_names)
 
-transaction_col_names = ["Transaction ID", "Statement ID", "Date", "Vendor", "Amount"]
+transaction_col_names = ["Transaction ID", "Statement ID", "Date", "Vendor", "Amount", "Cleared"]
 master_transaction_lines = pd.DataFrame(columns=transaction_col_names)
 
 def import_transactions(imported_df, transactions_df, col_map, statement_id) -> int:

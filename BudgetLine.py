@@ -2,10 +2,10 @@ class BudgetLine:
 
     def __init__(self, transaction_id, vendor, category, subcategory, amount, tag, notes):
         self.transaction_id=transaction_id
-        self.vendor=vendor[0]
-        self.category=category[0]
-        self.subcategory=subcategory[0]
-        self.amount=amount[0]
+        self.vendor=vendor
+        self.category=category
+        self.subcategory=subcategory
+        self.amount=amount
         self.tag=tag
         self.notes=notes
 
