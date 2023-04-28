@@ -6,8 +6,10 @@ VENDORS_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinance
 with open(VENDORS_FILE, 'r') as f:
     data = f.read()
 bs_data = BeautifulSoup(data, 'xml')
-bs_vendors = bs_data.find_all('vendor')
-
+bs_vendors = bs_data.find_all('vendor', {'name': "UBER"})
+# bs_vendors = bs_data.find_all('vendor')
+for v in bs_vendors:
+	print(v.find_all('subcategory')[0].contents[0])
 
 chase_col_map = {
 	'Transaction Date' : 'Date',
@@ -51,7 +53,7 @@ category_lookup = {
 	'Groceries' : ['Regular Groceries', 'Snacks', 'Meal Prep'],
 	'Mosi' : ['Boarding', 'Gear/Supplies', 'Veterinary', 'Wag!', 'Food', 'Grooming'],
 	'Personal Care' : ['Toiletries', 'Therapy', 'Medicine/Prescriptions', 'Haircuts'],
-	'Public Transportation' : ['Rideshare', 'Parking'],
+	'Transportation' : ['Rideshare', 'Parking'],
 	'Restaurants' : ['Coffee', 'Dining', 'Takeout'],
 	'Subscriptions' : ['iCloud', 'Streaming Services', 'Amazon Prime']
 }

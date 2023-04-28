@@ -6,13 +6,17 @@ import os
 import BudgetLine as bl
 import csv
 def input_transaction(transaction_id, date, vendor, amount) -> bl.BudgetLine:
-    # os.system('clear')
-    new_vendor=input_vendor(date, vendor)
-    os.system('clear')
-    new_category=input_category(date, vendor)
-    os.system('clear')
-    new_subcategory=input_subcategory(date, new_vendor, new_category)
-    os.system('clear')
+    result = get_autocomplete()
+    if result is None:
+        os.system('clear')
+        new_vendor=input_vendor(date, vendor)
+        os.system('clear')
+        new_category=input_category(date, vendor)
+        os.system('clear')
+        new_subcategory=input_subcategory(date, new_vendor, new_category)
+        os.system('clear')
+
+        result = bl.BudgetLine(transaction_id, new_vendor, new_category, new_subcategory, amount, '', '')
 
     print(date + '\t' + vendor + '\t' + new_category + '\t' + new_subcategory + '\t$' + str(amount) + '\n')
     new_tag = '#' + input("Input Tag: ")
@@ -22,21 +26,23 @@ def input_transaction(transaction_id, date, vendor, amount) -> bl.BudgetLine:
     new_notes = input('Notes:' )
     os.system('clear')
 
-    print(date + '\t' + vendor + '\t' + new_category + '\t' + new_subcategory + '\t$' + str(amount) + '\t' + new_tag + '\t' + new_notes + '\n')
+    print(date + '\t' + vendor + '\t' + new_category + '\t' + new_subcategory + '\t$' + str(
+        amount) + '\t' + new_tag + '\t' + new_notes + '\n')
     print()
     save = input_save()
     os.system('clear')
 
     if save == True:
-        return bl.BudgetLine(transaction_id, new_vendor, new_category, new_subcategory, amount, new_tag, new_notes)
+        return result
 
+def get_autocomplete() -> bl.BudgetLine:
+
+    return None
 def input_vendor(date, vendor) -> str:
-    for v in data.bs_vendors:
-        print(v.attrs)
     loop = True
     while loop is True:
-        print()
         print(date + '\t' + vendor)
+        print()
         i = input('Input vendor | ENTER to keep | l for vendor list: ')
 
         if i == '':
