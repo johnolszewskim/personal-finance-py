@@ -10,4 +10,4 @@ class BudgetLine:
         self.notes=notes
 
     def __str__(self):
-        return 'transaction_id: ' + str(self.transaction_id) + '\n' + 'self.vendor: ' + str(self.vendor) + '\n' + 'self.category: ' + str(self.category) + '\n' + 'self.subcategory: ' + str(self.subcategory) + '\n' + 'self.amount: ' + str(self.amount) + '\n' + 'self.tag:' + str(self.tag) + '\n' + 'self.notes: ' + str(self.notes)
+        return str(self.transaction_id) + '\t' + str(self.vendor) + '\t' + str(self.category) + '\t' + str(self.subcategory) + '\t$' + str(self.amount) + '\t' + str(self.tag) + '\t' + str(self.notes)

@@ -2,15 +2,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import PersonalFinancePYGUI as gui
 
-VENDORS_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/VENDORS_PersonalFinancePY.xml'
-with open(VENDORS_FILE, 'r') as f:
-    data = f.read()
-bs_data = BeautifulSoup(data, 'xml')
-bs_vendors = bs_data.find_all('vendor', {'name': "UBER"})
-# bs_vendors = bs_data.find_all('vendor')
-for v in bs_vendors:
-	print(v.find_all('subcategory')[0].contents[0])
-
 chase_col_map = {
 	'Transaction Date' : 'Date',
 	'Description' : 'Vendor',
