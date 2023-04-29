@@ -17,8 +17,8 @@ transactions_copy['Date'] = pd.to_datetime(transactions_copy['Date'])
 transactions_copy.sort_values(by='Date', inplace=True)
 transactions_copy = transactions_copy[transactions_copy['Transaction ID'].isin(budget_lines['Transaction ID']) == False]
 
-bl_budget_lines = {}
+last_tx = tx.Transaction
 for t in transactions_copy.iloc():
-    new_bl = func.input_transaction(t['Transaction ID'], str(t['Date']), t['Vendor'], t['Amount'])
+    last_tx = func.input_transaction(t['Transaction ID'], str(t['Date']), t['Vendor'], t['Amount'])
     bl_budget_lines = { new_bl.transaction_id : new_bl }
     func.write_budget_line(new_bl)

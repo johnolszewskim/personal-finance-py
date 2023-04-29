@@ -1,6 +1,13 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import PersonalFinancePYGUI as gui
+from prompt_toolkit.key_binding import KeyBindings
+
+bindings = KeyBindings()
+
+@bindings.add('a')
+def _(event):
+	print('a pressed')
 
 chase_col_map = {
 	'Transaction Date' : 'Date',

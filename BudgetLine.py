@@ -1,7 +1,8 @@
 class BudgetLine:
 
-    def __init__(self, transaction_id, vendor, category, subcategory, amount, tag, notes):
+    def __init__(self, transaction_id, date, vendor, category, subcategory, amount, tag, notes):
         self.transaction_id=transaction_id
+        self.date=date
         self.vendor=vendor
         self.category=category
         self.subcategory=subcategory
@@ -10,4 +11,10 @@ class BudgetLine:
         self.notes=notes
 
     def __str__(self):
-        return str(self.transaction_id) + '\t' + str(self.vendor) + '\t' + str(self.category) + '\t' + str(self.subcategory) + '\t$' + str(self.amount) + '\t' + str(self.tag) + '\t' + str(self.notes)
+        return str(self.transaction_id) + '\t' + \
+                str(self.date) + '\t' + \
+                str(self.vendor) + '\t' + \
+                str(self.category) + '\t' + \
+                str(self.subcategory) + '\t' + \
+                '$' + str(self.amount) + '\t' + \
+                str(self.tag) + '\t' + str(self.notes)

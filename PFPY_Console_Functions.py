@@ -6,8 +6,8 @@ import os
 import BudgetLine as bl
 import csv
 import PersonalFinancePYXML as pfxml
-def input_transaction(transaction_id, date, vendor, amount) -> bl.BudgetLine:
-    result = get_autocomplete(transaction_id, date, vendor, amount)
+def input_transaction(transaction_id, date, raw_vendor, amount) -> bl.BudgetLine:
+    result = get_autocomplete(transaction_id, date, raw_vendor, amount)
 
     autocompleted=False
     if result != None:
@@ -15,9 +15,9 @@ def input_transaction(transaction_id, date, vendor, amount) -> bl.BudgetLine:
 
     os.system('clear')
     if result is None:
-        result=bl.BudgetLine(transaction_id, date, vendor, "", amount, "", "")
+        result=bl.BudgetLine(transaction_id, date, raw_vendor, '', '', amount, '', '')
         os.system('clear')
-        result.vendor=input_vendor(date,vendor)
+        result.vendor=input_vendor(date, raw_vendor)
         os.system('clear')
         result.category=input_category(date, result.vendor)
         os.system('clear')
@@ -37,20 +37,22 @@ def input_transaction(transaction_id, date, vendor, amount) -> bl.BudgetLine:
     save = input_save()
     os.system('clear')
 
-    if save == True:
+    if save == 'r':
+
+    if save == 'y':
         # check if the vendor value is already in file
         if autocompleted == False:
-            pfxml.add_new_vendor(vendor, result)
+            pfxml.add_new_vendor(raw_vendor, result)
         return result
 
-def get_autocomplete(transaction_id, date, vendor,amount) -> bl.BudgetLine:
-    matching_vendors = pfxml.bs_data.find_all('vendor', {'name': vendor.replace(' ','').replace(u'\xa0','')})
+def get_autocomplete(transaction_id, date, raw_vendor, amount) -> bl.BudgetLine:
+    matching_vendors = pfxml.bs_data.find_all('vendor', {'name': raw_vendor.replace(' ', '').replace(u'\xa0', '')})
 
     for v in matching_vendors:
-        potential_bl = bl.BudgetLine(transaction_id, vendor, '', "", "", amount, "")
+        potential_bl = bl.BudgetLine(transaction_id, date, raw_vendor, '', '', '', amount, '')
         potential_bl.vendor = v.contents[0].strip()
-        potential_bl.category = v.find_all('category')[0].contents[0]
-        potential_bl.subcategory = v.find_all('subcategory')[0].contents[0]
+        potential_bl.category = v.find_all('category')[0].contents[0].strip()
+        potential_bl.subcategory = v.find_all('subcategory')[0].contents[0].strip()
         print(potential_bl)
         complete=input('Complete? y or n? ')
 
@@ -111,14 +113,10 @@ def input_subcategory(date, vendor, category) -> str:
         if subcategory_index < len(subcategories):
             return subcategories[int(subcategory_index)]
 
-def input_save() -> bool:
+def input_save() -> str:
 
     while True:
-        save = input('Save? y or n? ')
-        if save == 'y':
-            return True
-        if save == 'n':
-            return False
+        return input('Save? y or n? r to redo')
 
 def write_budget_line(b_l):
     d = {
