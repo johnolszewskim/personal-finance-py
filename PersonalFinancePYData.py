@@ -1,13 +1,6 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import PersonalFinancePYGUI as gui
-from prompt_toolkit.key_binding import KeyBindings
-
-bindings = KeyBindings()
-
-@bindings.add('a')
-def _(event):
-	print('a pressed')
 
 chase_col_map = {
 	'Transaction Date' : 'Date',
@@ -17,7 +10,6 @@ chase_col_map = {
 
 transaction_column_map = {
 	'Transaction ID': 'test',
-	'Statement ID': 'test',
 	'Date': {
 		'Chase': 'Transaction Date',
 		'American Express': 'Date'
@@ -93,7 +85,7 @@ def match_vendor_category(vendor) -> str:
 budget_col_names = ["Transaction ID", "Vendor", "Category", "Subcategory", "Amount", "Tag", "Notes"]
 master_budget_lines = pd.DataFrame(columns=budget_col_names)
 
-transaction_col_names = ["Transaction ID", "Statement ID", "Date", "Vendor", "Amount", "Cleared"]
+transaction_col_names = ["Transaction ID", "Date", "Vendor", "Amount", "Cleared"]
 master_transaction_lines = pd.DataFrame(columns=transaction_col_names)
 
 def import_transactions(imported_df, transactions_df, col_map, statement_id) -> int:
