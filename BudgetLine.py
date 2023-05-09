@@ -22,4 +22,13 @@ class BudgetLine:
 
     def copy(self):
         return BudgetLine(self.transaction_id, self.date, self.vendor, self.category, self.subcategory, self.amount, self.tag, self.notes)
-
+    def split(self):
+        return BudgetLine(self.transaction_id, self.date, self.vendor, '', '', self.amount, '', '')
+    def print_with_splits(self, splits):
+        [print(str(bl)) for bl in splits]
+        # print(self)
+    def print_splits(splits: []):
+        [print(bl) for bl in splits]
+    def adjust_transaction_ids_for_splits(splits: []):
+        for index, bl in enumerate(splits):
+            bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)

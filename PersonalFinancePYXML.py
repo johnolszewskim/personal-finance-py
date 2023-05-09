@@ -20,7 +20,6 @@ for c in categories:
     category_dict[cat]=subcat
 
 def add_new_vendor(vendor, b_l) -> bl.BudgetLine:
-    print('Adding vendor')
     root_tag=vendors_data.find_all('vendors')[0]
     vendor_tag = vendors_data.new_tag('vendor')
     vendor_tag['name'] = vendor.replace(' ','').replace(u'\xa0','')
