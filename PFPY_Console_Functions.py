@@ -7,118 +7,119 @@ import BudgetLine as bl
 import csv
 import PersonalFinancePYXML as pfxml
 import datetime
-def map_import_transactions(import_transactions, bank, statement_id) -> pd.DataFrame:
+def map_import_transactions(i_t, bank, statement_id) -> pd.DataFrame:
     new_transactions = pd.DataFrame(columns=data.transaction_column_map.keys())
 
-    new_transactions['Date'] = import_transactions[data.transaction_column_map['Date'][bank]]
-    new_transactions['Vendor'] = import_transactions[data.transaction_column_map['Vendor'][bank]]
-    new_transactions['Amount'] = import_transactions[data.transaction_column_map['Amount'][bank]]
+    new_transactions['Date'] = i_t[data.transaction_column_map['Date'][bank]]
+    new_transactions['Date'] = pd.to_datetime(new_transactions['Date'])
+    new_transactions.sort_values(by='Date', inplace=True)
+    new_transactions['Vendor'] = i_t[data.transaction_column_map['Vendor'][bank]]
+    new_transactions['Amount'] = i_t[data.transaction_column_map['Amount'][bank]]
+    if data.transaction_column_map['Amount Sign'][bank] == '-':
+        new_transactions['Amount'] = -new_transactions['Amount']
+    new_transactions.reset_index(drop=True, inplace=True)
     new_transactions['Transaction ID'] = new_transactions.index
-
-    new_transactions.set_index('Transaction ID')
+    new_transactions['Transaction ID'] = new_transactions['Transaction ID'].astype(str) + statement_id
 
     return new_transactions
-def import_single_transaction(budget_line) -> bl.BudgetLine:
-    result = get_autocomplete(budget_line)
-    raw_vendor = budget_line.vendor
 
-    autocompleted=True
-    if result is None:
-        autocompleted=False
+def import_single_transaction(b_l, bl_file) -> bl.BudgetLine:
+    raw_vendor = b_l.vendor  # save raw vendor for saving before it's changed
+    autocompleted = autocomplete(b_l)
 
     os.system('clear')
-    if result is None:
-        result=budget_line
+    if autocompleted is False:
         os.system('clear')
-        result.vendor=input_vendor(result)
+        input_vendor(b_l)
         os.system('clear')
-        input_categories=prompt_categories(result)
+
+        input_categories=prompt_categories(b_l)
 
         if input_categories[0] in pfxml.category_dict:
             pfxml.category_dict[input_categories[0]].append(input_categories[1])
         else:
             pfxml.category_dict[input_categories[0]] = [input_categories[1]]
         print(pfxml.category_dict)
-        result.category=input_categories[0]
-        result.subcategory=input_categories[1]
+        b_l.category=input_categories[0]
+        b_l.subcategory=input_categories[1]
         os.system('clear')
 
-    print(result)
-    result.tag = '#' + input("Input Tag: ")
+    print(b_l)
+    b_l.tag = '#' + input("Input Tag: ")
     os.system('clear')
 
-    print(result)
-    result.notes = input('Notes:' )
+    print(b_l)
+    b_l.notes = 'NOTES: ' + input('Notes:' )
     os.system('clear')
 
-    print(result)
+    print(b_l)
     print()
-    save = input_save()
+    bl_was_saved = save_appropriately(b_l, bl_file, autocompleted)
     os.system('clear')
 
-    if save == 'y':
-        write_budget_line(result)
-        # check if the vendor value is already in file
-        if autocompleted is False:
-            pfxml.add_new_vendor(raw_vendor, result)
-        return result
+    # check if the BudgetLine was saved
+    if bl_was_saved:
+        pfxml.add_new_vendor(raw_vendor, b_l)
 
-    return None
-
-def get_autocomplete(budget_line) -> bl.BudgetLine:
-    matching_vendors = pfxml.vendors_data.find_all('vendor', {'name': budget_line.vendor.replace(' ', '').replace(u'\xa0', '')})
-    potential_bl = budget_line.copy()
+def autocomplete(b_l) -> bool:
+    matching_vendors = pfxml.vendors_data.find_all('vendor', {'name': b_l.vendor.replace(' ', '').replace(u'\xa0', '')})
+    potential_bl = b_l.copy()
 
     for v in matching_vendors:
 
         potential_bl.vendor = v.contents[0].strip()
         potential_bl.category = v.find_all('category')[0].contents[0].strip()
         potential_bl.subcategory = v.find_all('subcategory')[0].contents[0].strip()
+        print(b_l)
         print(potential_bl)
         complete=input('Complete? y or n? ')
 
         if complete == 'y':
-            return potential_bl
+            b_l.vendor = potential_bl.vendor
+            b_l.category = potential_bl.category
+            b_l.subcategory = potential_bl.subcategory
 
-    return None
-def input_vendor(budget_line) -> str:
-    loop = True
-    while loop is True:
-        print(budget_line)
+            return True
+
+    return False
+def input_vendor(b_l):
+    vendor_dict = pfxml.get_vendor_dict()
+    vendor_set = set(vendor_dict.values())
+    while True:
+        print(b_l)
         print()
-        i = input('Input vendor | ENTER to keep | l for vendor list: ')
+        i = input('Input vendor | ENTER to keep | v for vendor list: ').strip()
 
-        if i == '':
+        if i == 'v':
             print()
-            return budget_line.vendor
-        elif i == 'l':
+            for index, v in enumerate(vendor_set):
+                print(str(index) + '. ' + v)
             print()
-            if budget_line.vendor in data.vendors:
-                print('0. ' + data.vendors[budget_line.vendor])
-            for index, v in enumerate(data.vendors.values()):
-                print(v)
-        elif i == '0':
+        elif i.isdigit():
             print()
-            return data.vendors[budget_line.vendor]
+            b_l.vendor = list(vendor_set)[int(i)]
+            return
         elif i == 'x':
             return
         else:
-            return i
-
+            b_l.vendor = i
+            return
 def prompt_categories(budget_line) -> (str,str):
 
     categories = list(pfxml.category_dict.keys())
 
     while True:
-        print(budget_line)
-        print_categories(8)
-        print('99: ADD CATEGORY/SUBCATEGORY')
-        print()
 
         valid_input = False
         input_category = ''
 
         while not valid_input:
+            os.system('clear')
+            print(budget_line)
+            print_categories(8)
+            print('99: ADD CATEGORY/SUBCATEGORY')
+            print()
+
             category_index = input('Input category: ')
             if not category_index.isdigit():
                 continue
@@ -128,12 +129,12 @@ def prompt_categories(budget_line) -> (str,str):
                 return prompt_custom_category_subcategory()
             if (category_index < len(categories)) and (category_index >= 0):
                 input_category = categories[category_index]
-                valid_input = True
+                input_subcategory = prompt_subcategory(input_category, budget_line)
 
-        input_subcategory = prompt_subcategory(input_category, budget_line)
-        if input_subcategory != '':
-            return (input_category,input_subcategory)
-        os.system('clear')
+                if input_subcategory == '99':
+                    continue
+                return (input_category,input_subcategory)
+                os.system('clear')
 
 def prompt_subcategory(category, budget_line) -> str:
     os.system('clear')
@@ -142,13 +143,15 @@ def prompt_subcategory(category, budget_line) -> str:
 
     for index, s in enumerate(subcategories):
         print(str(index) + ': ' + s)
-    print('ENTER: reselect category')
+    print('99: reselect category')
     print()
     while True:
         subcategory_index = input('Input subcategory: ')
         print()
-        if subcategory_index == '':
-            return ''
+        if subcategory_index.isdigit() is not True:
+            continue
+        if subcategory_index == '99':
+            return '99'
         if (int(subcategory_index) < len(subcategories)) and (int(subcategory_index) >= 0):
             return subcategories[int(subcategory_index)]
 
@@ -167,13 +170,19 @@ def prompt_custom_category_subcategory() -> (str,str):
             if keep == 'n':
                 valid_response = True
 
+def save_appropriately(b_l: bl.BudgetLine, bl_file, auto):
 
-def input_save() -> str:
+    save_response = ''
+    while (save_response != 'y'):# or (save_response != 'n'):
+        save_response = input('Save? y or n? ')
 
-    while True:
-        return input('Save? y or n? ')
+    if save_response == 'y':
+        write_budget_line(b_l, bl_file)
+        return True
 
-def write_budget_line(b_l):
+    return False
+
+def write_budget_line(b_l, bl_file):
     d = {
         'Transaction ID': b_l.transaction_id,
         'Vendor': b_l.vendor,
@@ -182,14 +191,13 @@ def write_budget_line(b_l):
         'Amount': b_l.amount,
         'Tag': b_l.tag,
         'Notes': b_l.notes}
-    FILENAME='/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/BUDGET_TRANSACTIONS_PersonalFinancePY.csv'
-    with open(FILENAME, 'a') as file:
+    with open(bl_file, 'a') as file:
         dict_obj=csv.DictWriter(file, fieldnames=PersonalFinancePYData.budget_col_names)
         dict_obj.writerow(d)
 
 def print_categories(rows):
     lines =['','','','']
-    for r,cat in enumerate(pfxml.category_dict.keys()):
+    for r,cat in enumerate(sorted(pfxml.category_dict.keys())):
         lines[r%4]=lines[r%4] + str(r) + ': ' + cat + '\t'
 
     for l in lines:

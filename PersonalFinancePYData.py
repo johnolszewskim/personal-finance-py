@@ -2,12 +2,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import PersonalFinancePYGUI as gui
 
-chase_col_map = {
-	'Transaction Date' : 'Date',
-	'Description' : 'Vendor',
-	'Amount' : 'Amount'
-}
-
 transaction_column_map = {
 	'Transaction ID': 'test',
 	'Date': {
@@ -22,6 +16,10 @@ transaction_column_map = {
 		'Chase': 'Amount',
 		'American Express': 'Amount'
 	},
+	'Amount Sign': {
+		'Chase': '-',
+		'American Express': '+'
+	}
 }
 
 account_lookup = {

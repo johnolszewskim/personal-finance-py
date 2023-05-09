@@ -37,6 +37,14 @@ def add_new_vendor(vendor, b_l) -> bl.BudgetLine:
 
     write_vendors_file()
 
+def get_vendor_dict():
+    vendors = vendors_data.find_all('vendor')
+    vendor_dict = {}
+    for v in vendors:
+        vendor_dict[v['name']] = v.contents[0].strip()
+
+    return vendor_dict
+
 def write_vendors_file():
     f = open(VENDORS_FILE, 'w')
     f.write(vendors_data.prettify())

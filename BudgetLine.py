@@ -13,7 +13,7 @@ class BudgetLine:
 
     def __str__(self):
         return str(self.transaction_id) + '\t' + \
-                self.date + '\t' + \
+                datetime.datetime.strftime(self.date, '%-d %b %y') + '\t' + \
                 str(self.vendor) + '\t' + \
                 str(self.category) + '\t' + \
                 str(self.subcategory) + '\t' + \
