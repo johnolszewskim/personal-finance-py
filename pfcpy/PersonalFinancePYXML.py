@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import BudgetLine as bl
+import datetime
 
 #   vendor information is loaded and kept in a BeautifulSoup object throughout execution
 VENDORS_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/VENDORS_PersonalFinancePY.xml'
@@ -19,7 +20,23 @@ for c in categories:
     subcat=c.find('subcategories').contents[0].split(',')
     category_dict[cat]=subcat
 
-def add_new_vendor(vendor, b_l) -> bl.BudgetLine:
+def get_saved_budget_line_dict(df_b_l) -> {}:
+    dict_b_l = {}
+    for index, b_l in df_b_l.iterrows():
+        dict_b_l[b_l['Transaction ID']] = bl.BudgetLine(
+            b_l['Transaction ID'],
+            datetime.date.fromisoformat(b_l['Date']),
+            b_l['Vendor'],
+            b_l['Category'],
+            b_l['Subcategory'],
+            b_l['Amount'],
+            b_l['Tag'],
+            b_l['Notes']
+
+        )
+    return dict_b_l
+
+def add_new_vendor(vendor, b_l):
     root_tag=vendors_data.find_all('vendors')[0]
     vendor_tag = vendors_data.new_tag('vendor')
     vendor_tag['name'] = vendor.replace(' ','').replace(u'\xa0','')

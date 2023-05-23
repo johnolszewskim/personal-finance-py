@@ -50,7 +50,7 @@ class TransactionWizard(tk.Frame):
         self.delete_cb = tk.Checkbutton(b_f, command=self.delete_checkbutton_clicked, variable=self.current_t_frame.delete_var.get(), onvalue=1, offvalue=0)
         self.delete_cb.grid(row=0, column=TransactionWizard.indices.index('index_Delete_Checkbutton'))
 
-        # TODO // Set default text to filename
+        # TODO.txt // Set default text to filename
         self.statement_entry=tk.Entry(b_f, width=50, textvariable=self.statement_name).grid(row=0, column=TransactionWizard.indices.index('index_StatementName'))
         tk.Button(b_f, text='Save', command=self.save).grid(row=0, column=TransactionWizard.indices.index('index_Save'), sticky='e')
         return b_f
@@ -88,7 +88,7 @@ class TransactionWizard(tk.Frame):
             self.current_t_frame.delete_var.set(0)
 
         self.current_t_frame.match_checkbutton()
-        # # TODO checkbox matching rotating through frames
+        # # TODO.txt checkbox matching rotating through frames
 
     def save(self):
 

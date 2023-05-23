@@ -1,20 +1,18 @@
 import pandas as pd
-
-import PersonalFinancePYData
 import PersonalFinancePYData as data
 import os
 import BudgetLine as bl
-import csv
 import PersonalFinancePYXML as pfxml
 import datetime
-def map_import_transactions(i_t, bank, statement_id) -> pd.DataFrame:
+
+def map_raw_transactions(r_t, bank, statement_id) -> pd.DataFrame:
     new_transactions = pd.DataFrame(columns=data.transaction_column_map.keys())
 
-    new_transactions['Date'] = i_t[data.transaction_column_map['Date'][bank]]
+    new_transactions['Date'] = r_t[data.transaction_column_map['Date'][bank]]
     new_transactions['Date'] = pd.to_datetime(new_transactions['Date'])
     new_transactions.sort_values(by='Date', inplace=True)
-    new_transactions['Vendor'] = i_t[data.transaction_column_map['Vendor'][bank]]
-    new_transactions['Amount'] = i_t[data.transaction_column_map['Amount'][bank]]
+    new_transactions['Vendor'] = r_t[data.transaction_column_map['Vendor'][bank]]
+    new_transactions['Amount'] = r_t[data.transaction_column_map['Amount'][bank]]
     if data.transaction_column_map['Amount Sign'][bank] == '-':
         new_transactions['Amount'] = -new_transactions['Amount']
     new_transactions.reset_index(drop=True, inplace=True)
@@ -22,14 +20,9 @@ def map_import_transactions(i_t, bank, statement_id) -> pd.DataFrame:
     new_transactions['Transaction ID'] = new_transactions['Transaction ID'].astype(str) + statement_id
 
     return new_transactions
-
-def import_single_transaction(split_budget_lines: [], bl_file , on_split= False) -> bl.BudgetLine:
-    b_l = split_budget_lines[-1]
-    raw_vendor = b_l.vendor  # save raw vendor for saving before it's changed
+def import_single_transaction(split_budget_lines: [], on_split= False) -> [bl.BudgetLine]:
+    b_l = split_budget_lines[-1] # get last split in list
     autocompleted = autocomplete(b_l)
-    os.system('clear')
-    if prompt_keep(b_l, split_budget_lines) is False:
-        return
     os.system('clear')
     split = prompt_split(b_l, split_budget_lines)
     os.system('clear')
@@ -38,19 +31,23 @@ def import_single_transaction(split_budget_lines: [], bl_file , on_split= False)
     if split:
         split_budget_lines.append(b_l.copy())
         bl.BudgetLine.adjust_transaction_ids_for_splits(split_budget_lines)
-        import_single_transaction(split_budget_lines, bl_file, True)
+        split_budget_lines = import_single_transaction(split_budget_lines, True)
 
-    if on_split:
-        return
+    # if on_split:
+    #     return split_budget_lines
 
-    bl_was_saved = prompt_save(split_budget_lines, bl_file)
-    # bl_was_saved = prompt_save(b_l, bl_file, autocompleted)
-    os.system('clear')
+    return split_budget_lines
 
-    # check if the BudgetLine was saved
-    if bl_was_saved:
-        pfxml.add_new_vendor(raw_vendor, b_l)
+def prompt_keep(splits) -> int:
 
+    while True:
+        print(splits[0])
+        response = input('Keep? y or n? ')
+
+        if response == 'y':
+            return 1
+        elif response == 'n':
+            return -1
 
 def autocomplete(b_l) -> bool:
     matching_vendors = pfxml.vendors_data.find_all('vendor', {'name': b_l.vendor.replace(' ', '').replace(u'\xa0', '')})
@@ -72,17 +69,9 @@ def autocomplete(b_l) -> bool:
 
             return True
 
+
     return False
-def prompt_keep(b_l, splits) -> bool:
 
-    while True:
-        b_l.print_with_splits(splits)
-        response = input('Keep? y or n? ')
-
-        if response == 'y':
-            return True
-        elif response == 'n':
-            return False
 def prompt_split(b_l, splits) -> bool:
 
     while True:
@@ -109,18 +98,17 @@ def prompt_single_transaction(b_l, splits, autocompleted):
         os.system('clear')
 
     b_l.print_with_splits(splits)
-    b_l.tag = '#' + input("Input Tag: ")
+    b_l.tag = input("Input Tag: ")
     os.system('clear')
 
     b_l.print_with_splits(splits)
-    b_l.notes = 'NOTES: ' + input('Notes:')
+    b_l.notes = input('Notes: ')
     os.system('clear')
 def prompt_vendor(b_l, splits):
     vendor_dict = pfxml.get_vendor_dict()
     vendor_set = set(vendor_dict.values())
     while True:
         b_l.print_with_splits(splits)
-        print()
         i = input('Input vendor | ENTER to keep | v for vendor list: ').strip()
 
         if i == 'v':
@@ -137,7 +125,7 @@ def prompt_vendor(b_l, splits):
         else:
             b_l.vendor = i
             return
-def prompt_categories(b_l, splits) -> (str,str):
+def prompt_categories(b_l, splits = []) -> (str,str):
 
     categories = sorted(pfxml.category_dict.keys())
 
@@ -162,15 +150,15 @@ def prompt_categories(b_l, splits) -> (str,str):
                 return prompt_custom_category_subcategory()
             if (category_index < len(categories)) and (category_index >= 0):
                 input_category = categories[category_index]
-                input_subcategory = prompt_subcategory(input_category, budget_line)
+                input_subcategory = prompt_subcategory(input_category, b_l)
 
                 if input_subcategory == '99':
                     continue
                 return (input_category,input_subcategory)
                 os.system('clear')
-def prompt_subcategory(category, budget_line) -> str:
+def prompt_subcategory(category, b_l) -> str:
     os.system('clear')
-    print(budget_line)
+    print(b_l)
     subcategories = pfxml.category_dict[category]
 
     for index, s in enumerate(subcategories):
@@ -200,8 +188,7 @@ def prompt_custom_category_subcategory() -> (str,str):
                 return (custom_category, custom_subcategory)
             if keep == 'n':
                 valid_response = True
-# def prompt_save(b_l: bl.BudgetLine, bl_file):
-def prompt_save(splits, bl_file):
+def prompt_save(splits, bl_file, bl_dict):
     bl.BudgetLine.print_splits(splits)
     print()
     save_response = ''
@@ -209,29 +196,19 @@ def prompt_save(splits, bl_file):
         save_response = input('Save? y or n? ')
 
     if save_response == 'y':
-        [write_budget_line(bl, bl_file) for bl in splits]
-        return True
+        [b_l.save_to_file(bl_file) for b_l in splits]
+        for b_l in splits:
+            bl_dict[b_l.transaction_id] = b_l
+        return
+    elif save_response == 'n':
+        return
 
     return False
-
-def write_budget_line(b_l, bl_file):
-    d = {
-        'Transaction ID': b_l.transaction_id,
-        'Vendor': b_l.vendor,
-        'Category': b_l.category,
-        'Subcategory': b_l.subcategory,
-        'Amount': b_l.amount,
-        'Tag': b_l.tag,
-        'Notes': b_l.notes}
-    with open(bl_file, 'a') as file:
-        dict_obj=csv.DictWriter(file, fieldnames=PersonalFinancePYData.budget_col_names)
-        dict_obj.writerow(d)
 def print_categories(rows):
     # lines =['','','','']
     lines = [[],[],[],[]]
     for r,cat in enumerate(sorted(pfxml.category_dict.keys())):
-        # lines[r%4]=lines[r%4] + str(r) + ': ' + cat + '\t'
-        lines[r%4].append(str(r) + ': ' + cat)
+        lines[r%rows].append(str(r) + ': ' + cat)
 
     for l in lines:
         row = ''
@@ -240,4 +217,4 @@ def print_categories(rows):
         print(row)
 
 
-    # print(f"{day:9} - {food:10}")
+
