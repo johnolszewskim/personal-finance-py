@@ -42,7 +42,10 @@ class ConsolePFPY(Console):
 
             if temp_bl is not None:
 
-                self.import_single_transaction([temp_bl])
+                result = self.import_single_transaction([temp_bl])
+                print('RESULT')
+                print(result)
+                input()
 
 
         print("DONE")
@@ -56,16 +59,16 @@ class ConsolePFPY(Console):
         else:
             return None
 
-    def import_single_transaction(self, b_l) -> bl.BudgetLine:
+    def import_single_transaction(self, splits) -> [bl.BudgetLine]:
 
         while True:
-            action = self.functions[self.func_index](b_l)
-            if action == 0:
-                break
+            action = self.functions[self.func_index](splits)
+            if action == 0: # the case that user does not 'keep'
+                return splits[:-1]
 
             self.func_index += action
-
-        print('END')
+            if self.func_index < 0:
+                return splits
 
     def prompt_keep(self, splits) -> int:
 
@@ -77,7 +80,7 @@ class ConsolePFPY(Console):
             if response == 'y':
                 return 1
             elif response == 'n':
-                return -1
+                return 0
 
     def prompt_autocomplete(self, splits) -> int:
         os.system('clear')
@@ -137,8 +140,9 @@ class ConsolePFPY(Console):
                 for index, v in enumerate(vendor_set):
                     print(str(index) + '. ' + v)
                 print()
+            elif i == '':
+                return 1
             elif i.isdigit(): # pick vendor from list
-                print()
                 splits[self.bl_index].vendor = list(vendor_set)[int(i)]
                 return 1
             elif i == 'x': # dont change vendor
@@ -256,6 +260,9 @@ class ConsolePFPY(Console):
             self.func_index = -1
             return 1
 
+
+        self.func_index = -2
+        return 1
 
     def prompt_save(self, splits):
 
