@@ -1,8 +1,4 @@
 from datetime import date as dt
-import csv
-
-import pandas._libs.tslibs.timestamps
-
 
 class BudgetLine:
 
@@ -43,17 +39,3 @@ class BudgetLine:
         for index, bl in enumerate(splits):
             bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)
 
-    def save_to_file(self, bl_file):
-        print('save_to_file')
-        d = {
-            'Transaction ID': self.transaction_id,
-            'Date': self.date.isoformat(),
-            'Vendor': self.vendor,
-            'Category': self.category,
-            'Subcategory': self.subcategory,
-            'Amount': self.amount,
-            'Tag': self.tag,
-            'Notes': self.notes}
-        with open(bl_file, 'a') as file:
-            dict_obj = csv.DictWriter(file, fieldnames=BudgetLine.field_names)
-            dict_obj.writerow(d)

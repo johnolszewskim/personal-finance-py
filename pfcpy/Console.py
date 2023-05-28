@@ -1,4 +1,4 @@
-from itertools import cycle
+from prompt_toolkit.key_binding import KeyBindings
 class Console:
 
     def __init__(self, functions: []):
