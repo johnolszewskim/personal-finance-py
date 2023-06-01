@@ -1,5 +1,4 @@
 import pandas as pd
-import PersonalFinancePYXML as pfxml
 import BudgetLine as bl
 import os
 import ConsolePFPY as console

@@ -1,4 +1,5 @@
 from datetime import date as dt
+from colorama import Fore, Style
 
 class BudgetLine:
 
@@ -13,11 +14,16 @@ class BudgetLine:
         self.tag=tag
         self.notes=notes
 
+        self.invalid_amount=False
+
         # print(self)
     def __str__(self):
 
         date = dt.strftime(self.date, '%-d %b %y')
-        return f'{str(self.transaction_id):>18}  ' + f'{date:<9}  ' + f'{str(self.vendor):<30}' + f'{str(self.category):>20} - ' + f'{str(self.subcategory):<20}' + f'${str(self.amount):<10}' + f'#{str(self.tag):<20}' + f'NOTES: {str(self.notes):<10}'
+        amount = str(self.amount)
+        if self.invalid_amount:
+            amount = Fore.RED + amount + Style.RESET_ALL
+        return f'{str(self.transaction_id):>18}  ' + f'{date:<9}  ' + f'{str(self.vendor):<30}' + f'{str(self.category):>20} - ' + f'{str(self.subcategory):<20}' + f'${amount:<15}' + f'#{str(self.tag):<20}' + f'NOTES: {str(self.notes):<10}'
     def copy(self):
         return BudgetLine(self.transaction_id, self.date, self.vendor, self.category, self.subcategory, self.amount, self.tag, self.notes)
     def refund(self, is_refund):
@@ -30,11 +36,7 @@ class BudgetLine:
         return self.amount
     def split(self):
         return BudgetLine(self.transaction_id, self.date, self.vendor, '', '', self.amount, '', '')
-    def print_with_splits(self, splits):
-        [print(str(bl)) for bl in splits]
-        # print(self)
-    def print_splits(splits: []):
-        [print(bl) for bl in splits]
+
     def adjust_transaction_ids_for_splits(splits: []):
         for index, bl in enumerate(splits):
             bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)
