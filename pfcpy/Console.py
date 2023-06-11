@@ -10,6 +10,11 @@ class Console:
     def run(self):
         print('Console.run()')
 
+    def next(self) -> int:
+
+        return 1
+
+
 
 
 

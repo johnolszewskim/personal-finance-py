@@ -1,13 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-from tkinter import simpledialog as sd
 from tkinter import ttk
-import Transaction as tx
 
 import pandas as pd
 
 import PersonalFinancePYData as data
-import SingleTransactionFrame
 import TransactionWizard as tw
 
 class PersonalFinancePYGUI(tk.Frame):

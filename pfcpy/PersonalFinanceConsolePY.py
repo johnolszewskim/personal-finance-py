@@ -1,10 +1,4 @@
-import pandas as pd
-import BudgetLine as bl
-import os
 import ConsolePFPY as console
-import DataManager
-from tkinter import filedialog as fd
-import datetime
 
 '''
 
@@ -27,10 +21,11 @@ historical BudgetLine transaction file and the historical Transaction File is wr
 the new transaction.
 
 '''
-SAVED_TRANSACTIONS_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/TRANSACTIONS_PersonalFinancePY.csv'
-SAVED_BUDGET_LINES_FILE = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/BUDGET_LINES_PersonalFinancePY.csv'
-STATEMENT_FILE = '/Users/johnmatthew/Documents/Personal Finance/3. Credit Card Statements/CHASE Freedom Unlimited 3387/3. Chase3387_Activity20230209_20230308_20230522.CSV'
+SAVED_TRANSACTIONS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/TRANSACTIONS_PersonalFinancePY.csv'
+SAVED_BUDGET_LINES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/BUDGET_LINES_PersonalFinancePY.csv'
+STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Gold Card 63002/2023/6. 2023-06-02.csv'
 
+# STATEMENT_FILE = fd.askopenfilename()
 
 c=console.ConsolePFPY(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
 c.run()

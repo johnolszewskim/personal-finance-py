@@ -1,11 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
 import PersonalFinancePYData as data
-import SingleBudgetLineFrame as sblf
-import SingleTransactionFrame as stlf
+from pfgui import SingleTransactionFrame as stlf
 import pandas as pd
 import Transaction as tx
-import BudgetLine as bl
+
 
 class TransactionWizard(tk.Frame):
     # indices variable for ease of moving widgets without having to type every column value

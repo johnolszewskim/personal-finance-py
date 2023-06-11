@@ -1,9 +1,7 @@
 import pandas as pd
 import tkinter as tk
 
-import PersonalFinancePYData as data
-import os
-import PersonalFinancePYGUI as GUI
+from pfgui import PersonalFinancePYGUI as GUI, PersonalFinancePYData as data
 
 app_directory = '/Users/johnmatthew/Documents/Personal Finance/0. PersonalFinancePY/'
 resources_filename = 'RESOURCES_PersonalFinancePY.csv'

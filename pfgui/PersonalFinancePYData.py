@@ -1,6 +1,5 @@
 import pandas as pd
-from bs4 import BeautifulSoup
-import PersonalFinancePYGUI as gui
+from pfgui import PersonalFinancePYGUI as gui
 
 transaction_column_map = {
 	'Transaction ID': 'test',
