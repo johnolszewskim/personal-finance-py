@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+import pandas as pd
 class Account:
 
     def __init__(self, name, number, exp, security, bank, closing_date):
@@ -9,29 +9,25 @@ class Account:
         self.bank = bank
         self.closing_date = closing_date
 
-    def load_accounts(accounts_filename: str) -> {}:
+    def load_accounts(accounts_filename: str) -> pd.DataFrame:
 
-        with open(accounts_filename, 'r') as accounts_file:
-            accounts_str = accounts_file.read()
+        df_accounts = pd.read_csv(accounts_filename,
+                                  dtype={'Name': str,
+                                         'Bank': str,
+                                         'Number': str,
+                                         'Expiration': str,
+                                         'Security': str,
+                                         'Closing Date':str})
 
-        accounts_data = BeautifulSoup(accounts_str, 'xml')
-        accounts = accounts_data.find_all('creditcard')
+        id = []
+        for i in range(len(df_accounts)):
+            if df_accounts.loc[i,'Bank'] == 'Chase':
+                key = df_accounts.loc[i,'Number'][-4:]
+            elif df_accounts.loc[i,'Bank'] == 'American Express':
+                key = df_accounts.loc[i,'Number'][-5:]
+            id = id + [key]
 
-        dict_accounts = {}
-        for a in accounts:
-            key = ''
-            if a['bank'] == 'Chase':
-                key = a['number'][-4:]
-            elif a['bank'] == 'American_Express':
-                key = a['number'][-5:]
+        df_accounts['id'] = id
+        df_accounts.set_index('id', inplace=True)
 
-            dict_accounts[key] = Account(
-                a.contents[0].strip(),
-                a["number"],
-                a["exp"],
-                a["sec"],
-                a["bank"].replace('_', ' '),
-                int(a["closing_date"])
-            )
-
-        return dict_accounts
+        return df_accounts

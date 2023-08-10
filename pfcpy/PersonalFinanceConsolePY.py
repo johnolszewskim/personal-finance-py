@@ -23,7 +23,7 @@ the new transaction.
 '''
 SAVED_TRANSACTIONS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/TRANSACTIONS_PersonalFinancePY.csv'
 SAVED_BUDGET_LINES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/BUDGET_LINES_PersonalFinancePY.csv'
-STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Gold Card 63002/2023/6. 2023-06-02.csv'
+STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Everyday Preferred 21001/2023/4. 2023-04-10.csv'
 
 # STATEMENT_FILE = fd.askopenfilename()
 
