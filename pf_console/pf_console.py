@@ -1,23 +1,21 @@
-import stat
-
-from pfcpy.Console import Console
-import BudgetLine as bl
+from pf_console.console import Console
+import pf_console.functions.prompt_functions as prompt
+import pf_console.budget_line as bl
+import pf_console.data_manager as dm
 import os
-import DataManager
-from colorama import Fore, Style
 
 
-class ConsolePFPY(Console):
+
+class PFConsole(Console):
 
     PRINT_CATEGORY_ROWS = 4
 
     def __init__(self, saved_transactions_file, saved_budget_lines_file, new_statement_file):
 
-        Console.__init__(self, [self.prompt_keep,
-                                self.prompt_refund,
-                                self.prompt_autocomplete,
-                                self.prompt_vendor,
-                                self.prompt_category,
+        Console.__init__(self, [prompt.prompt_keep,
+                                prompt.prompt_refund,
+                                prompt.prompt_vendor,
+                                prompt.prompt_category,
                                 self.prompt_custom_category,
                                 self.prompt_subcategory,
                                 self.prompt_amount,
@@ -26,45 +24,83 @@ class ConsolePFPY(Console):
                                 self.check_split_index,
                                 self.prompt_save])
 
-        self.dm = DataManager.DataManager(saved_transactions_file,
-                                          saved_budget_lines_file,
-                                          new_statement_file)
+        self.dm = dm.DataManager(saved_transactions_file,
+                                 saved_budget_lines_file,
+                                 new_statement_file)
 
         self.dict_budget_lines = self.dm.get_saved_budget_lines()
         self.saved_transactions = self.dm.get_saved_transactions()
-        self.new_transactions = self.dm.get_new_transactions()
 
-        self.split = False
+        self.new_transactions = self.dm.load_new_transactions()
+
+        self.splitting = False
         self.bl_index = 0
 
         self.statement_index = 0
-        self.statement_len = 0
+        self.statement_length = 0
 
         self.importing_tx = None
 
-    def run(self):
+    def run(self, at_func_index=0):
+        """
 
-        self.statement_len = len(self.new_transactions)
+        :param at_func_index:
+        :return:
+        """
+
+        self.statement_length = len(self.new_transactions)
 
         for i, tx in self.new_transactions.iterrows():
 
             self.statement_index = i
-
             self.importing_tx = tx
-            temp_bl = self.filter(i, tx)
-            self.bl_index=0
-            self.func_index=0
-            self.split=False
 
+            # check to see if tx has been imported
+            temp_bl = self.filter(i, tx)
+
+            # reset instance variables for new import
+            self.bl_index = 0
+            self.func_index = 0
+            self.splitting = False
+
+            # if tx had already been imported, temp_bl would be None
             if temp_bl is not None:
 
-                self.import_single_transaction([temp_bl])
+                self.functions[at_func_index](self, [temp_bl])
 
+    def next(self, splits):
+
+        self.func_index = self.func_index+1
+
+        if self.func_index >= len(self.functions):
+            pass
+
+        else:
+            self.functions[self.func_index](self, splits)
+
+    def previous(self, splits):
+
+        self.func_index = self.func_index - 1
+
+        if self.func_index < 0:
+            pass
+
+        else:
+            self.functions[self.func_index](self, splits)
+
+    def rerun(self, splits):
+        self.functions[self.func_index](self, splits)
     def filter(self, i, tx) -> bl.BudgetLine:
 
         if self.new_transactions.loc[i, 'Transaction ID'] not in self.saved_transactions['Transaction ID'].values:
-            return  bl.BudgetLine(tx['Transaction ID'], tx['Date'].to_pydatetime(), tx['Vendor'], '', '',
-                                     tx['Amount'], '', '')
+            return bl.BudgetLine(tx['Transaction ID'],
+                                 tx['Date'].to_pydatetime(),
+                                 tx['Vendor'],
+                                 '',
+                                 '',
+                                 tx['Amount'],
+                                 '',
+                                 '')
 
         else:
             return None
@@ -73,7 +109,7 @@ class ConsolePFPY(Console):
 
         while True:
             action = self.functions[self.func_index](splits)
-            if action == 0: # the case that user does not 'keep'
+            if action == 0:  # the case that user does not 'keep'
                 self.saved_transactions.loc[len(self.saved_transactions.index)] = self.importing_tx
                 self.dm.write_transactions(self.saved_transactions)
                 return
@@ -84,92 +120,9 @@ class ConsolePFPY(Console):
                 self.dm.write_transactions(self.saved_transactions)
                 return
 
-    def prompt_keep(self, splits) -> int:
-
-        while True:
-            os.system('clear')
-            self.print_splits(splits)
-            response = input('Keep? y or n? ')
-
-            if response == 'y':
-                return self.next()
-            elif response == 'n':
-                return 0
-
-    def prompt_refund(self, splits):
-        if splits[self.bl_index].get_amount() < 0:
-            while True:
-                os.system('clear')
-                self.print_splits(splits)
-                response = input('Is this transaction a refund? y or n? ')
-
-                if response == 'y':
-                    return self.prompt_refunded_budget_line(splits)
-                if response == 'n':
-                    return self.next()
-
-        return self.next()
-
-    def prompt_refunded_budget_line(self, splits) -> int:
-        os.system('clear')
-        dict_index_tid = {}
-        for index, tid in enumerate(list(self.dict_budget_lines.keys())):
-            temp = self.dict_budget_lines[tid]
-            print(f'{index:<5}{str(temp[0])}')
-            dict_index_tid[index] = tid
-        print('99: not listed')
-
-        while True:
-            bl_index = input('Input line to refund: ')
-            if not bl_index.isdigit():
-                continue
-            bl_index = int(bl_index)
-            if bl_index == 99:
-                return self.next()
-            elif (bl_index > len(dict_index_tid)) and (bl_index >= 0):
-                continue
-            else:
-                splits[self.bl_index].vendor = self.dict_budget_lines[dict_index_tid[bl_index]][0].vendor
-                splits[self.bl_index].category = self.dict_budget_lines[dict_index_tid[bl_index]][0].category
-                splits[self.bl_index].subcategory = self.dict_budget_lines[dict_index_tid[bl_index]][0].subcategory
-                splits[self.bl_index].tag = 'REFUND'
-                splits[self.bl_index].notes = str(self.dict_budget_lines[dict_index_tid[bl_index]][0].transaction_id)
-
-                self.print_splits(splits)
-                self.func_index = self.functions.index(self.prompt_save)-1
-                return self.next()
 
 
-    def prompt_autocomplete(self, splits) -> int:
 
-        matching_vendors = self.dm.get_matching_vendors(splits[self.bl_index].vendor)
-
-        if len(matching_vendors) == 0:
-            input('No autocomplete')
-            return self.next()
-
-        potential_splits = self.create_potential_budget_lines(splits, matching_vendors)
-
-        for index, bl in enumerate(potential_splits):
-
-            while True:
-                os.system('clear')
-                self.print_splits(splits)
-                self.print_splits(potential_splits, index, False)
-                complete = input('Complete? y or n? ')
-
-                if complete == 'y':
-                    splits[self.bl_index].vendor = bl.vendor
-                    splits[self.bl_index].category = bl.category
-                    splits[self.bl_index].subcategory = bl.subcategory
-                    splits[self.bl_index].tag = bl.tag
-                    splits[self.bl_index].notes = bl.notes
-                    self.func_index=self.functions.index(self.prompt_amount)-1
-                    return self.next()
-                if complete == 'n':
-                    break
-
-        return self.next()
 
     def create_potential_budget_lines(self, splits, matching_vendors) -> []:
 
@@ -195,62 +148,15 @@ class ConsolePFPY(Console):
         return potential_splits
 
     def split_bl(self, splits):
-        self.split = True
+        self.splitting = True
         splits.append(splits[self.bl_index].copy())
         for index, bl in enumerate(splits):
             bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)
 
 
-    def prompt_vendor(self, splits) -> int:
-
-        vendor_dict = self.dm.get_vendor_dict()
-        vendor_set = sorted(set(vendor_dict.values()))
 
 
-        while True:
-            os.system('clear')
-            self.print_splits(splits)
-            i = input('Input vendor | ENTER to keep | v for vendor list: ').strip()
 
-            if i == 'v':
-                print()
-                for index, v in enumerate(vendor_set):
-                    print(str(index) + '. ' + v)
-                input('ENTER to input vendor.')
-            elif i == '':
-                return 1
-            elif i.isdigit(): # pick vendor from list
-                splits[self.bl_index].vendor = list(vendor_set)[int(i)]
-                return 1
-            elif i == 'x': # dont change vendor
-                return 1
-            else:
-                splits[self.bl_index].vendor = i
-                return 1
-
-    def prompt_category(self, splits) -> int:
-
-        categories = sorted(self.dm.dict_categories.keys())
-
-        while True:
-
-            os.system('clear')
-            self.print_splits(splits)
-            self.print_categories(ConsolePFPY.PRINT_CATEGORY_ROWS)
-            print('99: ADD CATEGORY/SUBCATEGORY')
-            print()
-
-            category_index = input('Input category: ')
-            if category_index == '':
-                return 2
-            if not category_index.isdigit():
-                continue
-            category_index = int(category_index)
-            if category_index == 99:
-                return 1
-            if (category_index < len(categories)) and (category_index >= 0):
-                splits[self.bl_index].category = categories[category_index]
-                return 2
 
     def prompt_custom_category(self, splits) -> int:
 
@@ -258,7 +164,7 @@ class ConsolePFPY(Console):
 
             os.system('clear')
             self.print_splits(splits)
-            self.print_categories(ConsolePFPY.PRINT_CATEGORY_ROWS)
+            self.print_categories(PFConsole.PRINT_CATEGORY_ROWS)
             print('99: RETURN TO CATEGORY LIST')
             print()
 
@@ -415,41 +321,8 @@ class ConsolePFPY(Console):
                 return 1
 
 
-    def print_splits(self, splits, mark_index = None, print_statement_index = True):
 
-        if print_statement_index:
-            print('(' + str(self.statement_index+1) + ',' + str(self.statement_len) + ')')
 
-        if len(splits) == 1:
-            print(' ' + str(splits[0]))
-            return
-
-        if mark_index != None:
-            for i, b_l in enumerate(splits):
-                if i == mark_index:
-                    print('-' + str(b_l))
-                else:
-                    print(Fore.WHITE + ' ' + str(b_l) + Style.RESET_ALL)
-
-        else:
-            for i, b_l in enumerate(splits):
-                if i == self.bl_index:
-                    print('-' + str(b_l))
-                else:
-                    print(' ' + str(b_l))
-
-    def print_categories(self, rows):
-        # lines =['','','','']
-        lines = [[], [], [], []]
-        for r, cat in enumerate(sorted(self.dm.dict_categories.keys())):
-            lines[r % rows].append(str(r) + ': ' + cat)
-
-        print()
-        for l in lines:
-            row = ''
-            for c in l:
-                row = row + (f'{c:20}\t')
-            print(row)
 
     def save(self, splits):
 

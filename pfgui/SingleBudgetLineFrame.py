@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import pandas as pd
-import BudgetLine as bl
+from pf_console import budget_line as bl
 import PersonalFinancePYData as data
 
 class SingleBudgetLineFrame(tk.Frame):

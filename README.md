@@ -1,18 +1,10 @@
 # personal-finance-py
-Run PersonalFinancePY.py
+Run main_pf_console.py
 
-PersonalFinancePY is intended to ease managing personal finances by easing
-the process importing credit card transaction data from banks. The program will 
-import statement data in the form of a CSV file and, use data input to categorize
-transactions for budgeting.
-
-First development priority is the "transaction wizard" module which allows the user
-to easily load statements. The user can correct transaction information and
-categorize transactions. The program will use information from past transactions
-(saved in XML files, loaded at runtime, managed in program memory and written
-on specific occasions) to suggest corrected vendor names and categorization.
-The goal is to speed up the transaction import process and standardize data to be 
-used for analysis and budgeting. Transaction and Budget Line information is saved
-in CSV files for future use.
-
-Additional modules will be created for increased functionaity and analysis.
+This script was created to ease the ELT process in tracking personal finances.
+As opposed to creating and writing records by copying data from a banks website,
+this script loads a .CSV file from a specified bank and extract the data from
+each transaction, the raw data is then loaded into a transactions file.
+After the data is loaded, it is then, with user input, loaded into a 
+budget lines file. The loaded budget lines have normalized data and standardized
+formatting to create more accurate data for analysis and practical use.

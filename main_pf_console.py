@@ -1,4 +1,4 @@
-import ConsolePFPY as console
+import pf_console
 
 '''
 
@@ -12,22 +12,22 @@ information to map the transaction information into the standardized Transaction
 Transactions are stored in the heap in a pandas.DataFrame object.
 
 A CSV file of all historical transactions is stored on the hard drive. All historical transactions
-are laoded into a DataFrame and kept on the heap.
+are loaded into a DataFrame and kept on the heap.
 
 If a historical Transaction with the same transaction_id is not found then the transaction information
 is used to initialize a BudgetLine object. Once the user complete the BudgetLine transaction object it
 (or they, if the transaction is split in to multiple BudgetLine transactions) is loaded into the 
-historical BudgetLine transaction file and the historical Transaction File is wrtiten to include
+historical BudgetLine transaction file and the historical Transaction File is written to include
 the new transaction.
 
 '''
 SAVED_TRANSACTIONS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/TRANSACTIONS_PersonalFinancePY.csv'
 SAVED_BUDGET_LINES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/BUDGET_LINES_PersonalFinancePY.csv'
-STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Everyday Preferred 21001/2023/4. 2023-04-10.csv'
+STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Everyday Preferred 21001/2023/5. 2023-05-11.csv'
 
 # STATEMENT_FILE = fd.askopenfilename()
 
-c=console.ConsolePFPY(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
+c = pf_console.PFConsole(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
 c.run()
 
 print('ALL TRANSACTIONS IMPORTED.')

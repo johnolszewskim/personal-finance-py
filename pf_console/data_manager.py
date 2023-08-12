@@ -1,12 +1,10 @@
 import pandas as pd
-import BudgetLine as bl
+import pf_console.budget_line as bl
 import datetime
-from Account import Account
+from pf_console.account import Account
 from bs4 import BeautifulSoup
 import csv
-import os
-import calendar
-import prompt_functions as prompt
+import pf_console.functions.prompt_functions as prompt
 
 class DataManager:
 
@@ -51,37 +49,16 @@ class DataManager:
         self.BANK = self.df_accounts.loc[self.ACCOUNT].Bank
         self.STATEMENT_ID = self.create_statement_id(self.ACCOUNT,
                                                      self.YEAR,
-                                                     self.prompt_month(),
+                                                     prompt.prompt_month(self.new_statement_filename),
                                                      self.df_accounts.loc[self.ACCOUNT,'Closing Date'])
 
 
 
-    def prompt_month(self) -> int:
 
-        filename = self.new_statement_filename[self.new_statement_filename.rindex('/'):]
-        month = int(filename[1:filename.find('.')])
-
-        while True:
-
-            os.system('clear')
-            input_month = input('Closing Date: ' + calendar.month_name[month] + '\nInput month or ENTER to keep: ')
-
-            if input_month == "":
-                return month
-            if not input_month.isdigit():
-                continue
-            if int(input_month) < 0:
-                continue
-            if int(input_month) > 12:
-                continue
-
-            return int(input_month)
 
     def create_statement_id(self, account_number, year, month, date) -> str:
 
         return '_' + str(account_number) + '_'+ year + str(month).zfill(2) + str(date).zfill(2)
-
-
 
     def get_saved_budget_lines(self) -> {}:
 
@@ -116,7 +93,7 @@ class DataManager:
 
         return saved_transactions
 
-    def get_new_transactions(self) -> pd.DataFrame:
+    def load_new_transactions(self) -> pd.DataFrame:
 
         new_transactions = self.map_raw_transactions(pd.read_csv(self.new_statement_filename))
         new_transactions = new_transactions.loc[
