@@ -23,14 +23,29 @@ def print_splits(splits, statement_index, statement_length, bl_index, mark_index
                 print(' ' + str(b_l))
 
 
-def print_categories(console, rows):
-    lines = [[], [], [], []]
-    for r, cat in enumerate(sorted(console.dm.dict_categories.keys())):
-        lines[r % rows].append(str(r) + ': ' + cat)
+def print_categories(console) -> []:
+
+    lines = ['','','','','','','','','','']
+    categories = []
 
     print()
+    for b in console.dict_budget_categories.keys():
+        lines[0] = lines[0] + "\033[1m" + f'{b:20}\t' + "\033[0m"
+        for i,c in enumerate(console.dict_budget_categories[b]):
+            categories = categories + [c]
+            lines[i+1] = lines[i+1] + str(len(categories)-1) + '. ' + f'{c:19}\t'
+
     for l in lines:
-        row = ''
-        for c in l:
-            row = row + (f'{c:20}\t')
-        print(row)
+        print(l)
+
+    return categories
+
+def print_subcategories(console, category) -> []:
+
+    subcategories = []
+
+    for index, subcategory in enumerate(console.dm.dict_categories_subcategories[category]):
+        subcategories = subcategories + [subcategory]
+        print(str(index) + ': ' + subcategory)
+
+    return subcategories

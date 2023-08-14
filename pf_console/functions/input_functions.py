@@ -1,8 +1,13 @@
 import os
 import pf_console.functions.print_functions as prt
-def input_yes_no(console, splits):
+def did_input_yes(message='') -> bool:
 
-    pass
+    response = input(message + ' y or n? ')
+
+    if response == 'y' or response == '':
+        return True
+    elif response == 'n':
+        return False
 
 def input_vendor_name(console, splits):
 
@@ -32,7 +37,7 @@ def input_vendor_from_list(console, splits):
     elif response.isdigit():  # pick vendor from list
         splits[console.bl_index].vendor = list(vendor_set)[int(response)]
         return console.next(splits)
-def check_input_for_commands(response, console, splits):
+def check_input_for_commands(response, console, splits): # new
 
     if response == "-back":
         return console.previous(splits)
@@ -44,4 +49,21 @@ def check_input_for_commands(response, console, splits):
         return console.rerun(splits)
     elif response == "-show":
         pass
+
+
+def get_input_index(max_index, min_index=0, message='Select index: ', special_cases=[]) -> int: # new
+
+    while True:
+        response = input(message)
+
+        if response == '':
+            return -1
+
+        if response in special_cases:
+            return response
+
+        if response.isdigit():
+            response_int = int(response)
+            if response_int < max_index and response_int >= 0:
+                return response_int
 

@@ -51,12 +51,11 @@ def prompt_keep(console, splits):
     while True:
         os.system('clear')
         prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
-        response = input('Keep? y or n? ')
 
-        if response == 'y':
-            console.next(splits)
-        elif response == 'n':
-            return 0
+        if ipt.did_input_yes(message='\nKeep?'):
+            return console.next(splits)
+
+        return
 
 
 def prompt_refund(console, splits):
@@ -78,7 +77,7 @@ def prompt_refund(console, splits):
 
     return console.next(splits)
 
-def prompt_refunded_budget_line(console, splits) -> int:
+def prompt_refunded_budget_line(console, splits):
     os.system('clear')
     dict_index_tid = {}
     for index, tid in enumerate(list(console.dict_budget_lines.keys())):
@@ -106,6 +105,7 @@ def prompt_refunded_budget_line(console, splits) -> int:
             console.print_splits(splits)
             console.func_index = console.functions.index(console.prompt_save) - 1
             return console.next(splits)
+
 
 def prompt_autocomplete(console, splits) -> int:
 
@@ -139,47 +139,120 @@ def prompt_autocomplete(console, splits) -> int:
     return console.next(splits)
 
 
-def prompt_vendor(console, splits) -> int:
+def prompt_vendor(console, splits):
 
-    input("prompt_vendor()")
+    # input("prompt_vendor()") # for testing
 
-    suggest.suggest_vendor(console, splits)
+    if suggest.did_accept_suggested_vendor(console, splits):
+        console.next(splits)
 
-    input("RETURNED AFTER NO SUGGESTIONS")
+    # input("RETURNED AFTER !did_accept_suggested_vendor()") # for testing
 
     while True:
         os.system('clear')
         prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
 
-        i = ipt.input_vendor_name(console,splits)
+        i = "Costco" #ipt.input_vendor_name(console,splits)
         splits[console.bl_index].vendor = i
+        console.new_raw_vendor = True
 
         return console.next(splits)
 
 
-def prompt_category(console, splits) -> int:
+def prompt_category(console, splits):
 
-    input("prompt_category()")
+    # input("prompt_category()") # for testing
 
-    categories = sorted(console.dm.dict_categories.keys())
+    suggestion_index = -1
 
     while True:
 
         os.system('clear')
+        suggestion_index = suggest.suggest_category(console,splits, last_index=suggestion_index)
         prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
-        prt.print_categories(console.PRINT_CATEGORY_ROWS)
+        all_categories = prt.print_categories(console.dm)
 
         print('99: ADD CATEGORY/SUBCATEGORY')
-        print()
+        print()  # for formatting
 
-        category_index = input('Input category: ')
-        if category_index == '':
-            return 2
-        if not category_index.isdigit():
+        category_index = ipt.get_input_index(len(all_categories),
+                                             message='Input category number. ENTER to select suggestion. n for next '
+                                                     'suggestion: ',
+                                             special_cases=['99','n'])
+        if category_index == -1:
+            console.next(splits)
+        # elif category_index = '99'
+        elif category_index == 'n':
             continue
-        category_index = int(category_index)
-        if category_index == 99:
-            return 1
-        if (category_index < len(categories)) and (category_index >= 0):
-            splits[console.bl_index].category = categories[category_index]
-            return 2
+        else:
+            splits[console.bl_index].category = all_categories[category_index]
+            console.next(splits)
+
+
+# prompt custom category
+
+
+def prompt_subcategory(console, splits):
+
+    input('prompt_subcategory()')  # for testing
+
+    suggestion_index = -1
+    subcategories = console.dm.dict_categories_subcategories[splits[console.bl_index].category]
+
+    while True:
+
+        os.system('clear')
+        suggestion_index = suggest.suggest_subcategory(console, splits, last_index=suggestion_index)
+        prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+        print()
+        subcategories = prt.print_subcategories(console, splits[console.bl_index].category)
+        print('88: ADD CUSTOM SUBCATEGORY')
+        print('99: REINPUT CATEGORY')
+        print()  # for formatting
+
+        subcategory_index = ipt.get_input_index(len(subcategories),
+                                             message='Input subcategory number. ENTER to select suggestion. n for next '
+                                                     'suggestion: ',
+                                             special_cases=['88','99', 'n'])
+
+        if subcategory_index == -1:
+            console.next(splits)
+        # elif category_index = '99'
+        # elif category_index = '99'
+        elif subcategory_index == 'n':
+            continue
+        else:
+            splits[console.bl_index].subcategory = subcategories[subcategory_index]
+            console.next(splits)
+        # custom = False
+        #
+        # print()
+        # if len(subcategories) == 0:
+        #     print('No subcategories.')
+        #     print('99: REINPUT CATEGORY')
+        #     subcategory = input('\nInput custom subcategory: ')
+        #     custom = True
+        # else:
+        #     for index, subcat in enumerate(subcategories):
+        #         print(str(index) + ': ' + subcat)
+        #     print('88: ADD CUSTOM SUBCATEGORY')
+        #     print('99: REINPUT CATEGORY')
+        #     subcategory = input('\nInput subcategory: ')
+        # print()
+        #
+        # if subcategory == "":
+        #     return 1
+        # elif custom == True:
+        #     splits[console.bl_index].subcategory = subcategory
+        #     return 1
+        # elif subcategory == '99':
+        #     console.func_index = console.functions.index(console.prompt_category) - 1
+        #     return 1
+        # elif subcategory == '88':
+        #     splits[console.bl_index].subcategory = input('\nInput custom subcategory: ')
+        #     return 1
+        # elif subcategory.isdigit() is not True:
+        #     continue
+        # elif (int(subcategory) < len(subcategories)) and (int(subcategory) >= 0):
+        #     splits[console.bl_index].subcategory = subcategories[int(subcategory)]
+        #     return 1

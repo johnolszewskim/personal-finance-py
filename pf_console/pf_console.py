@@ -16,8 +16,8 @@ class PFConsole(Console):
                                 prompt.prompt_refund,
                                 prompt.prompt_vendor,
                                 prompt.prompt_category,
-                                self.prompt_custom_category,
-                                self.prompt_subcategory,
+                                # self.prompt_custom_category,
+                                prompt.prompt_subcategory,
                                 self.prompt_amount,
                                 self.prompt_tag,
                                 self.prompt_notes,
@@ -27,6 +27,8 @@ class PFConsole(Console):
         self.dm = dm.DataManager(saved_transactions_file,
                                  saved_budget_lines_file,
                                  new_statement_file)
+
+        self.new_raw_vendor = False # new
 
         self.dict_budget_lines = self.dm.get_saved_budget_lines()
         self.saved_transactions = self.dm.get_saved_transactions()
@@ -171,53 +173,14 @@ class PFConsole(Console):
             custom_category = input('Input custom category: ')
             if not custom_category.isdigit():
                 splits[self.bl_index].category = custom_category
-                self.dm.dict_categories[custom_category] = []
+                self.dm.dict_categories_subcategories[custom_category] = []
                 self.func_index=self.functions.index(self.prompt_subcategory)-1
                 return 1
             if int(custom_category) == 99:
                 self.func_index = self.functions.index(self.prompt_category)-1
                 return 1
 
-    def prompt_subcategory(self, splits) -> int:
 
-        subcategories = self.dm.dict_categories[splits[self.bl_index].category]
-
-        while True:
-
-            os.system('clear')
-            self.print_splits(splits)
-            custom = False
-
-            print()
-            if len(subcategories) == 0:
-                print('No subcategories.')
-                print('99: REINPUT CATEGORY')
-                subcategory = input('\nInput custom subcategory: ')
-                custom = True
-            else:
-                for index, subcat in enumerate(subcategories):
-                    print(str(index) + ': ' + subcat)
-                print('88: ADD CUSTOM SUBCATEGORY')
-                print('99: REINPUT CATEGORY')
-                subcategory = input('\nInput subcategory: ')
-            print()
-
-            if subcategory == "":
-                return 1
-            elif custom == True:
-                splits[self.bl_index].subcategory = subcategory
-                return 1
-            elif subcategory == '99':
-                self.func_index = self.functions.index(self.prompt_category)-1
-                return 1
-            elif subcategory == '88':
-                splits[self.bl_index].subcategory = input('\nInput custom subcategory: ')
-                return 1
-            elif subcategory.isdigit() is not True:
-                continue
-            elif (int(subcategory) < len(subcategories)) and (int(subcategory) >= 0):
-                splits[self.bl_index].subcategory = subcategories[int(subcategory)]
-                return 1
 
     def prompt_custom_subcategory(self, splits) -> int:
         return 1

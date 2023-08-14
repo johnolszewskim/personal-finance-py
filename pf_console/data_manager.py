@@ -5,6 +5,7 @@ from pf_console.account import Account
 from bs4 import BeautifulSoup
 import csv
 import pf_console.functions.prompt_functions as prompt
+import pf_console.functions.load_functions as load
 
 class DataManager:
 
@@ -31,7 +32,7 @@ class DataManager:
     VENDORS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/VENDORS_PersonalFinancePY.xml'
     CATEGORIES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/CATEGORIES_PersonalFinancePY.xml'
     ACCOUNTS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/ACCOUNTS_PersonalFinancePY.csv'
-
+    RAW_VENDOR_TO_VENDOR_FILENAME = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/RAW_VENDOR_TO_VENDOR_PersonalFinancePY.csv'
     def __init__(self, saved_transactions_filename, saved_budget_lines_filename, new_statement_filename):
 
         self.YEAR = '2023'
@@ -40,7 +41,12 @@ class DataManager:
         self.saved_budget_lines_filename = saved_budget_lines_filename
         self.new_statement_filename = new_statement_filename
 
-        self.dict_categories = self.load_categories()
+        self.df_budget_lines = pd.read_csv(self.saved_budget_lines_filename)  # new
+
+        self.dict_categories_subcategories = {}  # new
+        self.dict_budget_categories = {}  # new
+        load.load_categories(self) # new
+
         self.data_categories = BeautifulSoup()
         self.data_vendors = self.load_vendors()
         self.df_accounts = Account.load_accounts(self.ACCOUNTS_FILE)
@@ -62,11 +68,11 @@ class DataManager:
 
     def get_saved_budget_lines(self) -> {}:
 
-        df_budget_lines = pd.read_csv(self.saved_budget_lines_filename)
+
 
         dict_bl = {}
 
-        for index, b_l in df_budget_lines.iterrows():
+        for index, b_l in self.df_budget_lines.iterrows():
 
             new_bl = bl.BudgetLine(
                 b_l['Transaction ID'],
@@ -125,22 +131,7 @@ class DataManager:
 
         return vendors_data
 
-    def load_categories(self) -> {}:
 
-        with open(DataManager.CATEGORIES_FILE, 'r') as categories_file:
-            categories_str = categories_file.read()
-
-        self.data_categories = BeautifulSoup(categories_str, 'xml')
-        categories = self.data_categories.find_all('category')
-        category_dict = {}
-        for c in categories:
-            cat = c['name']
-            category_dict[cat]=[]
-            subcategories = c.find_all('subcategory')
-            for sc in subcategories:
-                category_dict[cat] = category_dict[cat] + [sc['name']]
-
-        return category_dict
 
 
     def get_matching_vendors(self, raw_vendor) -> []:
@@ -252,14 +243,14 @@ class DataManager:
 
     def save_category(self, category, subcategory):
 
-        if category not in self.dict_categories:
-            self.dict_categories[category] = []
+        if category not in self.dict_categories_subcategories:
+            self.dict_categories_subcategories[category] = []
             input('writing new category and subcategory')
             self.write_category(category, subcategory)
             return
 
-        if subcategory not in self.dict_categories[category]:
-            self.dict_categories[category] = self.dict_categories[category] + [subcategory]
+        if subcategory not in self.dict_categories_subcategories[category]:
+            self.dict_categories_subcategories[category] = self.dict_categories_subcategories[category] + [subcategory]
             input('writing just new subcategory')
             self.write_category(category, subcategory, new_category=False)
             return
@@ -271,13 +262,13 @@ class DataManager:
         root_tag = self.data_categories.new_tag('categories')
         self.data_categories.append(root_tag)
 
-        for c in self.dict_categories.keys():
+        for c in self.dict_categories_subcategories.keys():
 
             category_tag = self.data_categories.new_tag('category')
             category_tag['name'] = c
             root_tag.append(category_tag)
 
-            for sc in self.dict_categories[c]:
+            for sc in self.dict_categories_subcategories[c]:
                 subcategory_tag = self.data_categories.new_tag('subcategory')
                 subcategory_tag['name'] = sc
                 category_tag.append(subcategory_tag)
@@ -285,7 +276,11 @@ class DataManager:
         f = open(DataManager.CATEGORIES_FILE, 'w')
         f.write(self.data_categories.prettify())
 
+    def get_bl_matching_vendors(self, vendor) -> pd.DataFrame:
 
+        matching = self.df_budget_lines.loc[self.df_budget_lines['Vendor'] == vendor]
+
+        return matching
 
 
 
