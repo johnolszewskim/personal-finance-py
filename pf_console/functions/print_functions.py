@@ -1,4 +1,9 @@
+import os
 from colorama import Fore, Style
+import pf_console.functions.input_functions as ipt
+import pandas as pd
+pd.options.display.max_rows = 1000
+
 
 def print_splits(splits, statement_index, statement_length, bl_index, mark_index=None, print_statement_index=True):
     if print_statement_index:
@@ -44,8 +49,56 @@ def print_subcategories(console, category) -> []:
 
     subcategories = []
 
+    if category not in console.dm.dict_categories_subcategories:
+        return subcategories
+
     for index, subcategory in enumerate(console.dm.dict_categories_subcategories[category]):
         subcategories = subcategories + [subcategory]
         print(str(index) + ': ' + subcategory)
 
     return subcategories
+
+def print_all_element(console, splits, element):
+
+    os.system('clear')
+    print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+    print()
+
+    if element not in console.dm.df_budget_lines.columns:
+        return
+
+    df_element = console.dm.df_budget_lines[element]
+    df_element = df_element.drop_duplicates()
+    df_element.reset_index(drop=True, inplace=True)
+
+    for i,e in enumerate(df_element):
+        print(f"{str(i):>3}: {e:10}")
+    print()
+
+    element_to_see_index = ipt.input_index(console, splits, len(df_element),
+                                           message='*(text) to search for ' + element + ' containing or input index to see all transactions with ' + element + ': ',
+                                           special_cases=['*'],
+                                           special_cases_just_starts_with=True)
+
+    if not element_to_see_index:
+        return
+    if str(element_to_see_index).startswith('*'):
+        print_all_with_element_value(console, splits, element, element_to_see_index, contains=True)  # element_to_see_index is a '*asdfjk'
+    else:
+        print_all_with_element_value(console, splits, element, df_element[int(element_to_see_index)])
+
+
+def print_all_with_element_value(console, splits, element, value, contains=False):
+
+    os.system('clear')
+    print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+    print()
+    if contains:
+        value_str = str(value)
+        value_str = value_str[1:]
+
+        print(console.dm.df_budget_lines[console.dm.df_budget_lines[element].str.contains(value_str)])
+    else:
+        print(console.dm.df_budget_lines.loc[console.dm.df_budget_lines[element] == value])
+
+    input('\nENTER to return.')

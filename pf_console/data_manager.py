@@ -42,6 +42,7 @@ class DataManager:
         self.new_statement_filename = new_statement_filename
 
         self.df_budget_lines = pd.read_csv(self.saved_budget_lines_filename)  # new
+        self.df_budget_lines = self.df_budget_lines.fillna('')  # new
 
         self.dict_categories_subcategories = {}  # new
         self.dict_budget_categories = {}  # new
@@ -130,9 +131,6 @@ class DataManager:
         vendors_data = BeautifulSoup(vendors_str, 'xml')
 
         return vendors_data
-
-
-
 
     def get_matching_vendors(self, raw_vendor) -> []:
 
@@ -282,5 +280,8 @@ class DataManager:
 
         return matching
 
+    def save_splits(self, splits):
+
+        input('save_splits()')
 
 
