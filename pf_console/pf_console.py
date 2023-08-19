@@ -12,7 +12,7 @@ class PFConsole(Console):
 
     def __init__(self, saved_transactions_file, saved_budget_lines_file, new_statement_file):
 
-        Console.__init__(self, [prompt.prompt_keep,
+        Console.__init__(self, [prompt.prompt_import,
                                 # prompt.prompt_refund,
                                 prompt.prompt_vendor,
                                 prompt.prompt_category,
@@ -22,22 +22,18 @@ class PFConsole(Console):
                                 prompt.prompt_amount,
                                 prompt.prompt_tag,
                                 prompt.prompt_notes,
-                                prompt.prompt_save])
+                                prompt.prompt_save,
+                                self.finish])
 
-        self.dm = dm.DataManager(saved_transactions_file,
+        self.dm = dm.DataManager(self, saved_transactions_file,
                                  saved_budget_lines_file,
                                  new_statement_file)
 
         self.new_raw_vendor = False # new
 
-        self.dict_budget_lines = self.dm.get_saved_budget_lines()
-        self.saved_transactions = self.dm.get_saved_transactions()
-
         self.new_transactions = self.dm.load_new_transactions()
 
-        self.splitting = False
         self.bl_index = 0
-
         self.statement_index = 0
         self.statement_length = 0
 
@@ -63,12 +59,13 @@ class PFConsole(Console):
             # reset instance variables for new import
             self.bl_index = 0
             self.func_index = 0
-            self.splitting = False
 
             # if tx had already been imported, temp_bl would be None
             if temp_bl is not None:
-
-                self.functions[at_func_index](self, [temp_bl])
+                self.func_index = 0
+                self.bl_index = 0
+                self.functions[self.func_index](self, [temp_bl])
+                input("FINISHED ONE")
 
     def next(self, splits, to_func_index=-1):
 
@@ -101,7 +98,7 @@ class PFConsole(Console):
         self.functions[self.func_index](self, splits)
     def filter(self, i, tx) -> bl.BudgetLine:
 
-        if self.new_transactions.loc[i, 'Transaction ID'] not in self.saved_transactions['Transaction ID'].values:
+        if self.new_transactions.loc[i, 'Transaction ID'] not in self.dm.df_saved_transactions['Transaction ID'].values:
             return bl.BudgetLine(tx['Transaction ID'],
                                  tx['Date'].to_pydatetime(),
                                  tx['Vendor'],
@@ -114,25 +111,5 @@ class PFConsole(Console):
         else:
             return None
 
-
-    def check_split_index(self, splits) -> int:
-
-        if self.bl_index < len(splits)-1:
-            self.bl_index += 1
-            self.func_index = -1
-
-        return 1
-
-    def save(self, splits):
-
-        for budget_line in splits:
-
-            self.dm.save_new_vendor(self.importing_tx['Vendor'], budget_line)
-            self.dm.save_category(budget_line.category, budget_line.subcategory)
-
-
-            self.dm.write_budget_line(budget_line)
-            self.dict_budget_lines = self.dm.get_saved_budget_lines()
-
-        #change back split to false
-        # reset index to 0
+    def finish(self, splits):
+        exit(0)

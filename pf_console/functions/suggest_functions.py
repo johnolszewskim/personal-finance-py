@@ -8,13 +8,11 @@ def did_accept_suggested_vendor(console, splits):
 
     prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
 
-    raw_vendor_to_vendor_df = pd.read_csv(console.dm.RAW_VENDOR_TO_VENDOR_FILENAME)
-    matching_vendors = raw_vendor_to_vendor_df.loc[
-        raw_vendor_to_vendor_df['raw_vendor'] == splits[0].vendor.replace(' ', '').replace(u'\xa0', '')]
+    matching_vendors = console.dm.df_raw_vendor_to_vendor.loc[
+        console.dm.df_raw_vendor_to_vendor['raw_vendor'] == splits[0].vendor.replace(' ', '').replace(u'\xa0', '')]
     matching_vendors.reset_index(drop=True, inplace=True)
 
     if len(matching_vendors) == 0:
-        input('No autocomplete')
         return
 
     os.system('clear')
@@ -26,7 +24,7 @@ def did_accept_suggested_vendor(console, splits):
     print('Input index or ENTER to input new vendor.')
     response_index = ipt.input_index(console, splits, len(matching_vendors))
 
-    if not response_index:
+    if response_index is None:
         return False
 
     splits[console.bl_index].vendor = matching_vendors.loc[response_index]['vendor']

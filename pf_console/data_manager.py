@@ -33,23 +33,30 @@ class DataManager:
     CATEGORIES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/CATEGORIES_PersonalFinancePY.xml'
     ACCOUNTS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/ACCOUNTS_PersonalFinancePY.csv'
     RAW_VENDOR_TO_VENDOR_FILENAME = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/RAW_VENDOR_TO_VENDOR_PersonalFinancePY.csv'
-    def __init__(self, saved_transactions_filename, saved_budget_lines_filename, new_statement_filename):
+    def __init__(self, pf_console, saved_transactions_filename, saved_budget_lines_filename, new_statement_filename):
 
+        self.pf_console = pf_console
         self.YEAR = '2023'
 
         self.saved_transactions_filename = saved_transactions_filename
         self.saved_budget_lines_filename = saved_budget_lines_filename
         self.new_statement_filename = new_statement_filename
 
+        self.df_raw_vendor_to_vendor = pd.read_csv(DataManager.RAW_VENDOR_TO_VENDOR_FILENAME, index_col=['index'])
+
         self.df_budget_lines = pd.read_csv(self.saved_budget_lines_filename)  # new
         self.df_budget_lines = self.df_budget_lines.fillna('')  # new
 
+        self.df_saved_transactions = self.get_saved_transactions()  # new
+
         self.dict_categories_subcategories = {}  # new
         self.dict_budget_categories = {}  # new
-        load.load_categories(self) # new
 
         self.data_categories = BeautifulSoup()
-        self.data_vendors = self.load_vendors()
+        load.load_categories(self) # new
+
+
+        # self.data_vendors = self.load_vendors()
         self.df_accounts = Account.load_accounts(self.ACCOUNTS_FILE)
 
         self.ACCOUNT = prompt.prompt_account(self.df_accounts)
@@ -132,12 +139,12 @@ class DataManager:
 
         return vendors_data
 
-    def get_matching_vendors(self, raw_vendor) -> []:
-
-        matches = self.data_vendors.find_all('vendor',
-                                                       {'name': raw_vendor.replace(' ', '').replace(u'\xa0', '')})
-
-        return matches
+    # def get_matching_vendors(self, raw_vendor) -> []:
+    #
+    #     matches = self.data_vendors.find_all('vendor',
+    #                                                    {'name': raw_vendor.replace(' ', '').replace(u'\xa0', '')})
+    #
+    #     return matches
 
     def is_exact_matching_vendor(self, raw_vendor, budget_line) -> bool:
 
@@ -177,49 +184,7 @@ class DataManager:
 
         return False
 
-    def get_vendor_dict(self):
 
-        vendors = self.data_vendors.find_all('vendor')
-        vendor_dict = {}
-        for v in vendors:
-            vendor_dict[v['name']] = v.contents[0].strip()
-
-        return vendor_dict
-
-    def save_new_vendor(self, raw_vendor, budget_line):
-
-        if self.is_exact_matching_vendor(raw_vendor, budget_line):
-            input('dont write new vendor')
-            return
-
-        input('writing new vendor')
-
-        root_tag = self.data_vendors.find_all('vendors')[0]
-        vendor_tag = self.data_vendors.new_tag('vendor')
-        vendor_tag['name'] = raw_vendor.replace(' ', '').replace(u'\xa0', '')
-        vendor_tag.string = budget_line.vendor
-        root_tag.append(vendor_tag)
-
-        category_tag = self.data_vendors.new_tag('category')
-        category_tag.string = budget_line.category
-        vendor_tag.append(category_tag)
-
-        subcategory_tag = self.data_vendors.new_tag('subcategory')
-        subcategory_tag.string = budget_line.subcategory
-        vendor_tag.append(subcategory_tag)
-
-        if budget_line.tag != '':
-            tag_tag = self.data_vendors.new_tag('tag')
-            tag_tag.string = budget_line.tag
-            vendor_tag.append(tag_tag)
-
-        if budget_line.notes != '':
-            notes_tag = self.data_vendors.new_tag('notes')
-            notes_tag.string = budget_line.notes
-            vendor_tag.append(notes_tag)
-
-        f = open(DataManager.VENDORS_FILE, 'w')
-        f.write(self.data_vendors.prettify())
 
     def write_budget_line(self, budget_line):
 
@@ -239,49 +204,80 @@ class DataManager:
     def write_transactions(self, saved_transactions):
         saved_transactions.to_csv(self.saved_transactions_filename, index=False)
 
-    def save_category(self, category, subcategory):
-
-        if category not in self.dict_categories_subcategories:
-            self.dict_categories_subcategories[category] = []
-            input('writing new category and subcategory')
-            self.write_category(category, subcategory)
-            return
-
-        if subcategory not in self.dict_categories_subcategories[category]:
-            self.dict_categories_subcategories[category] = self.dict_categories_subcategories[category] + [subcategory]
-            input('writing just new subcategory')
-            self.write_category(category, subcategory, new_category=False)
-            return
-
-    def write_category(self, category, subcategory, new_category = True):
-
-        print(self.data_categories.prettify())
-
-        root_tag = self.data_categories.new_tag('categories')
-        self.data_categories.append(root_tag)
-
-        for c in self.dict_categories_subcategories.keys():
-
-            category_tag = self.data_categories.new_tag('category')
-            category_tag['name'] = c
-            root_tag.append(category_tag)
-
-            for sc in self.dict_categories_subcategories[c]:
-                subcategory_tag = self.data_categories.new_tag('subcategory')
-                subcategory_tag['name'] = sc
-                category_tag.append(subcategory_tag)
-
-        f = open(DataManager.CATEGORIES_FILE, 'w')
-        f.write(self.data_categories.prettify())
-
     def get_bl_matching_vendors(self, vendor) -> pd.DataFrame:
 
         matching = self.df_budget_lines.loc[self.df_budget_lines['Vendor'] == vendor]
 
         return matching
 
-    def save_splits(self, splits):
+    def save_splits(self, console, splits):  # keep
 
         input('save_splits()')
 
+        for budget_line in splits:
+            self.save_new_vendor(console.importing_tx['Vendor'].replace(' ', '').replace(u'\xa0', ''), budget_line)
+            self.save_category_subcategory(console, splits, budget_line.category, budget_line.subcategory)
 
+            self.df_budget_lines.loc[len(self.df_budget_lines.index)] = [budget_line.transaction_id, budget_line.date, budget_line.vendor, budget_line.category, budget_line.subcategory, budget_line.amount, budget_line.tag, budget_line.notes]
+            self.df_saved_transactions.loc[len(self.df_saved_transactions.index)] = console.importing_tx
+
+        input(self.df_budget_lines)
+        input(self.df_saved_transactions)
+
+        self.df_budget_lines.to_csv(self.saved_budget_lines_filename)
+        self.df_saved_transactions.to_csv(self.saved_transactions_filename)
+
+    def save_new_vendor(self, raw_vendor, budget_line): # keep, validated
+
+        if budget_line.vendor in self.df_raw_vendor_to_vendor['vendor'].values:
+            return
+        else:
+            self.df_raw_vendor_to_vendor.loc[len(self.df_raw_vendor_to_vendor.index)] = [raw_vendor, budget_line.vendor]
+
+        self.df_raw_vendor_to_vendor.to_csv(self.RAW_VENDOR_TO_VENDOR_FILENAME)
+        return
+
+    def save_category_subcategory(self, console, splits, category, subcategory):  # keep
+
+        is_new_category = False
+        is_new_subcategory = False
+
+        if category not in self.dict_categories_subcategories.keys():
+            is_new_category=True
+            self.dict_categories_subcategories[category] = []
+
+        if subcategory not in self.dict_categories_subcategories[category]:
+            self.dict_categories_subcategories[category] = self.dict_categories_subcategories[category] + [subcategory]
+            is_new_subcategory=True
+
+        return self.write_categories_subcategories(console, splits, category, subcategory, is_new_category, is_new_subcategory)
+
+    def write_categories_subcategories(self, console, splits, category, subcategory, is_new_category, is_new_subcategory):
+
+        if not is_new_category and not is_new_subcategory:
+            return
+
+        # if adding a new category
+        if is_new_category:
+            budget_name = prompt.prompt_budget(console, splits)
+            category_tag = self.write_new_category(category, budget_name)
+        #if only adding a new subcategory
+        else:
+            category_tag = self.data_categories.categories.find_all('category', attrs={'name': category})[0]
+
+        if is_new_subcategory:
+            new_subcategory_tag = self.data_categories.new_tag('subcategory')
+            new_subcategory_tag['name'] = subcategory
+            category_tag.append(new_subcategory_tag)
+
+        f = open(DataManager.CATEGORIES_FILE, 'w')
+        f.write(self.data_categories.prettify())
+        return
+
+    def write_new_category(self, category, budget_name):
+        categories_tag = self.data_categories.categories
+        new_tag = self.data_categories.new_tag('category')
+        new_tag['name'] = category
+        new_tag['budget'] = budget_name
+        categories_tag.append(new_tag)
+        return new_tag

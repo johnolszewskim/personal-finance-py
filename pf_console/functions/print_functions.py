@@ -45,6 +45,7 @@ def print_categories(console) -> []:
 
     return categories
 
+
 def print_subcategories(console, category) -> []:
 
     subcategories = []
@@ -102,3 +103,9 @@ def print_all_with_element_value(console, splits, element, value, contains=False
         print(console.dm.df_budget_lines.loc[console.dm.df_budget_lines[element] == value])
 
     input('\nENTER to return.')
+
+def print_budgets(console, splits):
+
+    for i,b in enumerate(console.dm.dict_budget_categories.keys()):
+        print(f"{str(i):>3}: {b:10}")
+    print()

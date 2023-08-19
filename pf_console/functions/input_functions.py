@@ -5,14 +5,45 @@ import pf_console.functions.print_functions  as prt
 
 def did_input_yes(console, splits, message='') -> bool:
 
-    response = input(message + ' y or n? ')
+    while True:
+        response = input(message + ' y or n? ')
 
-    if str.startswith(response, '-'):
-        check_input_for_commands(response, console, splits)
-    elif response == 'y' or response == '':
-        return True
-    elif response == 'n':
-        return False
+        if str.startswith(response, '-'):
+            check_input_for_commands(response, console, splits)
+        elif response == 'y' or response == '':
+            return True
+        elif response == 'n':
+            return False
+
+
+def input_vendor_name(console, splits):
+
+    i = input('\nInput vendor. ENTER to keep. -v for vendor list: ').strip()
+
+    if i == '':
+        i = splits[console.bl_index].vendor
+    if i == '-v':
+        input_vendor_from_list(console, splits)
+    elif str.startswith(i, '-'):
+        check_input_for_commands(i, console, splits)
+    return i
+
+
+def input_vendor_from_list(console, splits):
+
+    os.system('clear')
+    vendor_dict = console.dm.get_vendor_dict()
+    vendor_set = sorted(set(vendor_dict.values()))
+
+    print()
+    for index, v in enumerate(vendor_set):
+        print(str(index) + '. ' + v)
+    response = input('ENTER to input vendor.')
+    if response == '':
+        return console.rerun(splits)
+    elif response.isdigit():  # pick vendor from list
+        splits[console.bl_index].vendor = list(vendor_set)[int(response)]
+        return console.next(splits)
 
 
 def check_input_for_commands(response, console, splits): # new
@@ -94,3 +125,11 @@ def input_amount(console, splits, message='ENTER to accept, \'-\'(item amount), 
         else:
             splits[console.bl_index].amount = response_flt
             return
+
+def input1():
+    input('in input1()')
+    input2()
+    input('input1() after input2() call')
+
+def input2():
+    input('in input2')
