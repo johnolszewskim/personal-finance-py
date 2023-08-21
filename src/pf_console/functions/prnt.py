@@ -1,7 +1,8 @@
 import os
-from colorama import Fore, Style
-import pf_console.functions.input_functions as ipt
 import pandas as pd
+from colorama import Fore, Style
+import src.pf_console.functions.input as inpt
+
 pd.options.display.max_rows = 1000
 
 
@@ -76,10 +77,10 @@ def print_all_element(console, splits, element):
         print(f"{str(i):>3}: {e:10}")
     print()
 
-    element_to_see_index = ipt.input_index(console, splits, len(df_element),
-                                           message='*(text) to search for ' + element + ' containing or input index to see all transactions with ' + element + ': ',
-                                           special_cases=['*'],
-                                           special_cases_just_starts_with=True)
+    element_to_see_index = inpt.input_index(console, splits, len(df_element),
+                                            message='*(text) to search for ' + element + ' containing or input index to see all transactions with ' + element + ': ',
+                                            special_cases=['*'],
+                                            special_cases_just_starts_with=True)
 
     if not element_to_see_index:
         return
@@ -103,6 +104,7 @@ def print_all_with_element_value(console, splits, element, value, contains=False
         print(console.dm.df_budget_lines.loc[console.dm.df_budget_lines[element] == value])
 
     input('\nENTER to return.')
+
 
 def print_budgets(console, splits):
 

@@ -1,6 +1,6 @@
 import os
-import pf_console.functions.splits_functions as splt
-import pf_console.functions.print_functions  as prt
+import src.pf_console.functions.splits as splt
+import src.pf_console.functions.prnt as prnt
 
 
 def did_input_yes(console, splits, message='') -> bool:
@@ -116,7 +116,7 @@ def input_amount(console, splits, message='ENTER to accept, \'-\'(item amount), 
         except:
             input('not a float')
             os.system('clear')
-            prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+            prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
             print()
             continue
 

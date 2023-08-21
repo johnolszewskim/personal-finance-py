@@ -1,12 +1,11 @@
-import pf_console.functions.input_functions as ipt
-import pf_console.functions.print_functions as prt
-import pandas as pd
+import src.pf_console.functions.input as inpt
+import src.pf_console.functions.prnt as prnt
 import os
 
 
 def did_accept_suggested_vendor(console, splits):
 
-    prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+    prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
 
     matching_vendors = console.dm.df_raw_vendor_to_vendor.loc[
         console.dm.df_raw_vendor_to_vendor['raw_vendor'] == splits[0].vendor.replace(' ', '').replace(u'\xa0', '')]
@@ -16,13 +15,13 @@ def did_accept_suggested_vendor(console, splits):
         return
 
     os.system('clear')
-    prt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
+    prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
     print()
     for i, v in enumerate(matching_vendors['vendor']):
         print(str(i) + ': ' + v)
 
     print('Input index or ENTER to input new vendor.')
-    response_index = ipt.input_index(console, splits, len(matching_vendors))
+    response_index = inpt.input_index(console, splits, len(matching_vendors))
 
     if response_index is None:
         return False

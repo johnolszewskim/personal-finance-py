@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<categories>
+ <category budget="Daily_Living" name="Alcohol">
+  <subcategory name="Bar/Brewery">
+  </subcategory>
+  <subcategory name="Liquor Store">
+  </subcategory>
+  <subcategory name="Tobacco">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Education">
+  <subcategory name="Books">
+  </subcategory>
+  <subcategory name="Supplies">
+  </subcategory>
+  <subcategory name="Fees">
+  </subcategory>
+  <subcategory name="Equipment">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Groceries">
+  <subcategory name="Regular Groceries">
+  </subcategory>
+  <subcategory name="Snacks">
+  </subcategory>
+  <subcategory name="Meal Prep">
+  </subcategory>
+  <subcategory name="Nutrition">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Mosi">
+  <subcategory name="Boarding">
+  </subcategory>
+  <subcategory name="Gear">
+  </subcategory>
+  <subcategory name="Veterinary">
+  </subcategory>
+  <subcategory name="Wag!">
+  </subcategory>
+  <subcategory name="Food">
+  </subcategory>
+  <subcategory name="Grooming">
+  </subcategory>
+  <subcategory name="Toys">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Personal Care">
+  <subcategory name="Toiletries">
+  </subcategory>
+  <subcategory name="Therapy">
+  </subcategory>
+  <subcategory name="Medicine">
+  </subcategory>
+  <subcategory name="Prescriptions">
+  </subcategory>
+  <subcategory name="Haircuts">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Transportation">
+  <subcategory name="Rideshare">
+  </subcategory>
+  <subcategory name="Parking">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Restaurants">
+  <subcategory name="Coffee">
+  </subcategory>
+  <subcategory name="Dining">
+  </subcategory>
+  <subcategory name="Takeout">
+  </subcategory>
+ </category>
+ <category budget="Daily_Living" name="Marine Corps">
+  <subcategory name="Uniforms">
+  </subcategory>
+  <subcategory name="TAD">
+  </subcategory>
+  <subcategory name="Miscellaneous">
+  </subcategory>
+  <subcategory name="Social">
+  </subcategory>
+  <subcategory name="Gear">
+  </subcategory>
+ </category>
+ <category budget="Auto" name="Auto Insurance">
+  <subcategory name="Premium Payment">
+  </subcategory>
+ </category>
+ <category budget="Auto" name="Fuel">
+  <subcategory name="Ellen">
+  </subcategory>
+  <subcategory name="Red">
+  </subcategory>
+  <subcategory name="Sloan">
+  </subcategory>
+ </category>
+ <category budget="Auto" name="Tolls/Fees">
+  <subcategory name="Parking Ticket">
+  </subcategory>
+  <subcategory name="Registration Fees">
+  </subcategory>
+  <subcategory name="Tolls">
+  </subcategory>
+ </category>
+ <category budget="Auto" name="Maintenance">
+  <subcategory name="Ellen">
+  </subcategory>
+  <subcategory name="Red">
+  </subcategory>
+  <subcategory name="Sloan">
+  </subcategory>
+ </category>
+ <category budget="Auto" name="Auto General">
+  <subcategory name="Tools">
+  </subcategory>
+  <subcategory name="Auto Supplies">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Entertainment">
+  <subcategory name="App Purchase">
+  </subcategory>
+  <subcategory name="Books">
+  </subcategory>
+  <subcategory name="Tickets">
+  </subcategory>
+  <subcategory name="Streaming Services">
+  </subcategory>
+  <subcategory name="Board Games">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Clothing">
+  <subcategory name="Clothing">
+  </subcategory>
+  <subcategory name="Accessories">
+  </subcategory>
+  <subcategory name="Summer Clothes">
+  </subcategory>
+  <subcategory name="Activewear">
+  </subcategory>
+  <subcategory name="Shoes">
+  </subcategory>
+  <subcategory name="Winter Clothes">
+  </subcategory>
+  <subcategory name="Repairs">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Flying">
+  <subcategory name="Medical">
+  </subcategory>
+  <subcategory name="Membership Fees">
+  </subcategory>
+  <subcategory name="Plane Rental/Fuel">
+  </subcategory>
+  <subcategory name="Gear">
+  </subcategory>
+  <subcategory name="Training">
+  </subcategory>
+  <subcategory name="FBO">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Hobbies">
+  <subcategory name="DIY">
+  </subcategory>
+  <subcategory name="Music">
+  </subcategory>
+  <subcategory name="Sewing">
+  </subcategory>
+  <subcategory name="Leathercraft">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Recreation">
+  <subcategory name="Membership Fees">
+  </subcategory>
+  <subcategory name="Skiing">
+  </subcategory>
+  <subcategory name="Cycling">
+  </subcategory>
+  <subcategory name="Camping">
+  </subcategory>
+  <subcategory name="Passes/Fees">
+  </subcategory>
+  <subcategory name="Nutrition">
+  </subcategory>
+  <subcategory name="Scuba Diving">
+  </subcategory>
+  <subcategory name="Outdoor Gear">
+  </subcategory>
+  <subcategory name="Running">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Miscellaneous">
+  <subcategory name="Tech">
+  </subcategory>
+  <subcategory name="Luxuries">
+  </subcategory>
+  <subcategory name="Interest">
+  </subcategory>
+  <subcategory name="Bank Fees">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Dating">
+  <subcategory name="App Purchase">
+  </subcategory>
+  <subcategory name="Date">
+  </subcategory>
+  <subcategory name="Gift">
+  </subcategory>
+ </category>
+ <category budget="Home_Expenses" name="Internet">
+  <subcategory name="Monthly Payment">
+  </subcategory>
+  <subcategory name="Cloud Services">
+  </subcategory>
+ </category>
+ <category budget="Home_Expenses" name="Home Expenses">
+  <subcategory name="Tools">
+  </subcategory>
+  <subcategory name="Supplies">
+  </subcategory>
+  <subcategory name="Kitchen">
+  </subcategory>
+  <subcategory name="Organization">
+  </subcategory>
+  <subcategory name="Bedroom">
+  </subcategory>
+  <subcategory name="Office">
+  </subcategory>
+  <subcategory name="Cleaning">
+  </subcategory>
+  <subcategory name="Laundry">
+  </subcategory>
+ </category>
+ <category budget="Home_Expenses" name="Phone">
+  <subcategory name="Equipment">
+  </subcategory>
+  <subcategory name="Monthly Payment">
+  </subcategory>
+ </category>
+ <category budget="Home_Expenses" name="Rent">
+  <subcategory name="Monthly Payment">
+  </subcategory>
+  <subcategory name="Deposit">
+  </subcategory>
+ </category>
+ <category budget="Home_Expenses" name="Home Decor">
+  <subcategory name="Plants">
+  </subcategory>
+  <subcategory name="Decor">
+  </subcategory>
+  <subcategory name="Furniture">
+  </subcategory>
+ </category>
+ <category budget="Generosity" name="Gifts">
+  <subcategory name="Gift">
+  </subcategory>
+  <subcategory name="Donation">
+  </subcategory>
+  <subcategory name="Meal">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Travel">
+  <subcategory name="Souvenirs">
+  </subcategory>
+  <subcategory name="Administration">
+  </subcategory>
+  <subcategory name="Lodging">
+  </subcategory>
+  <subcategory name="Flights">
+  </subcategory>
+ </category>
+ <category budget="Luxuries" name="Luxuries">
+  <subcategory name="Tattoos">
+  </subcategory>
+ </category>
+ <category budget="Unknown" name="Unknown">
+ </category>
+</categories>

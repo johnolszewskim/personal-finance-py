@@ -9,10 +9,12 @@ def split_bl(console, splits, amount):
     reindex_splits(splits)
     console.rerun(splits)
 
+
 def reindex_splits(splits):
 
     for index, bl in enumerate(splits):
         bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)
+
 
 def change_active_budget_line(console, splits, bl_index):
 

@@ -1,14 +1,10 @@
-from pf_console.console import Console
-import pf_console.functions.prompt_functions as prompt
-import pf_console.budget_line as bl
-import pf_console.data_manager as dm
-import os
-
+from src.pf_console.objects.console import Console
+import src.pf_console.functions.prompt as prompt
+from src.pf_console.objects import budget_line as bl
+import src.pf_console.objects.data_manager as dm
 
 
 class PFConsole(Console):
-
-    PRINT_CATEGORY_ROWS = 4
 
     def __init__(self, saved_transactions_file, saved_budget_lines_file, new_statement_file):
 
@@ -22,8 +18,7 @@ class PFConsole(Console):
                                 prompt.prompt_amount,
                                 prompt.prompt_tag,
                                 prompt.prompt_notes,
-                                prompt.prompt_save,
-                                self.finish])
+                                prompt.prompt_save])
 
         self.dm = dm.DataManager(self, saved_transactions_file,
                                  saved_budget_lines_file,
@@ -36,7 +31,6 @@ class PFConsole(Console):
         self.bl_index = 0
         self.statement_index = 0
         self.statement_length = 0
-
         self.importing_tx = None
 
     def run(self, at_func_index=0):
@@ -110,6 +104,3 @@ class PFConsole(Console):
 
         else:
             return None
-
-    def finish(self, splits):
-        exit(0)

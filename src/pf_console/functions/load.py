@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
+import src.pf_console.datasets as datasets
+
 
 def load_categories(data_manager) -> {}:
-    with open(data_manager.CATEGORIES_FILE, 'r') as categories_file:
+
+    with open(datasets.get_categories(), 'r') as categories_file:
         categories_str = categories_file.read()
 
     data_manager.data_categories = BeautifulSoup(categories_str, 'xml')

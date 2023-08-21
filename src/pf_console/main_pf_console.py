@@ -1,4 +1,4 @@
-import pf_console
+from src.pf_console.objects import pf_console as pfc
 
 '''
 
@@ -27,7 +27,7 @@ STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Car
 
 # STATEMENT_FILE = fd.askopenfilename()
 
-c = pf_console.PFConsole(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
+c = pfc.PFConsole(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
 c.run()
 
 print('ALL TRANSACTIONS IMPORTED.')

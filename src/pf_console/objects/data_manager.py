@@ -1,11 +1,13 @@
 import pandas as pd
-import pf_console.budget_line as bl
 import datetime
-from pf_console.account import Account
 from bs4 import BeautifulSoup
 import csv
-import pf_console.functions.prompt_functions as prompt
-import pf_console.functions.load_functions as load
+import src.pf_console.functions.prompt as prmpt
+import src.pf_console.functions.load as ld
+from src.pf_console.objects import account
+from src.pf_console.objects import budget_line as bl
+import src.pf_console.datasets as datasets
+
 
 class DataManager:
 
@@ -33,6 +35,7 @@ class DataManager:
     CATEGORIES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/CATEGORIES_PersonalFinancePY.xml'
     ACCOUNTS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/ACCOUNTS_PersonalFinancePY.csv'
     RAW_VENDOR_TO_VENDOR_FILENAME = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/RAW_VENDOR_TO_VENDOR_PersonalFinancePY.csv'
+
     def __init__(self, pf_console, saved_transactions_filename, saved_budget_lines_filename, new_statement_filename):
 
         self.pf_console = pf_console
@@ -44,26 +47,27 @@ class DataManager:
 
         self.df_raw_vendor_to_vendor = pd.read_csv(DataManager.RAW_VENDOR_TO_VENDOR_FILENAME, index_col=['index'])
 
-        self.df_budget_lines = pd.read_csv(self.saved_budget_lines_filename)  # new
+        self.df_budget_lines = pd.read_csv(self.saved_budget_lines_filename, header=0, index_col=['index'])  # new
         self.df_budget_lines = self.df_budget_lines.fillna('')  # new
 
-        self.df_saved_transactions = self.get_saved_transactions()  # new
+        self.df_saved_transactions = pd.read_csv(self.saved_transactions_filename, header=0, index_col=['index'])  # new
+        self.df_saved_transactions = self.df_saved_transactions.fillna('')
 
         self.dict_categories_subcategories = {}  # new
         self.dict_budget_categories = {}  # new
 
         self.data_categories = BeautifulSoup()
-        load.load_categories(self) # new
+        ld.load_categories(self) # new
 
 
         # self.data_vendors = self.load_vendors()
-        self.df_accounts = Account.load_accounts(self.ACCOUNTS_FILE)
+        self.df_accounts = account.load_accounts(self.ACCOUNTS_FILE)
 
-        self.ACCOUNT = prompt.prompt_account(self.df_accounts)
+        self.ACCOUNT = prmpt.prompt_account(self.df_accounts)
         self.BANK = self.df_accounts.loc[self.ACCOUNT].Bank
         self.STATEMENT_ID = self.create_statement_id(self.ACCOUNT,
                                                      self.YEAR,
-                                                     prompt.prompt_month(self.new_statement_filename),
+                                                     prmpt.prompt_month(self.new_statement_filename),
                                                      self.df_accounts.loc[self.ACCOUNT,'Closing Date'])
 
 
@@ -138,13 +142,6 @@ class DataManager:
         vendors_data = BeautifulSoup(vendors_str, 'xml')
 
         return vendors_data
-
-    # def get_matching_vendors(self, raw_vendor) -> []:
-    #
-    #     matches = self.data_vendors.find_all('vendor',
-    #                                                    {'name': raw_vendor.replace(' ', '').replace(u'\xa0', '')})
-    #
-    #     return matches
 
     def is_exact_matching_vendor(self, raw_vendor, budget_line) -> bool:
 
@@ -221,9 +218,6 @@ class DataManager:
             self.df_budget_lines.loc[len(self.df_budget_lines.index)] = [budget_line.transaction_id, budget_line.date, budget_line.vendor, budget_line.category, budget_line.subcategory, budget_line.amount, budget_line.tag, budget_line.notes]
             self.df_saved_transactions.loc[len(self.df_saved_transactions.index)] = console.importing_tx
 
-        input(self.df_budget_lines)
-        input(self.df_saved_transactions)
-
         self.df_budget_lines.to_csv(self.saved_budget_lines_filename)
         self.df_saved_transactions.to_csv(self.saved_transactions_filename)
 
@@ -259,7 +253,7 @@ class DataManager:
 
         # if adding a new category
         if is_new_category:
-            budget_name = prompt.prompt_budget(console, splits)
+            budget_name = prmpt.prompt_budget(console, splits)
             category_tag = self.write_new_category(category, budget_name)
         #if only adding a new subcategory
         else:
@@ -270,7 +264,7 @@ class DataManager:
             new_subcategory_tag['name'] = subcategory
             category_tag.append(new_subcategory_tag)
 
-        f = open(DataManager.CATEGORIES_FILE, 'w')
+        f = open(datasets.get_categories(), 'w')
         f.write(self.data_categories.prettify())
         return
 

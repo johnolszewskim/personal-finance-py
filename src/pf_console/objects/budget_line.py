@@ -1,6 +1,4 @@
 from datetime import date as dt
-
-import pandas as pd
 from colorama import Fore, Style
 
 class BudgetLine:
