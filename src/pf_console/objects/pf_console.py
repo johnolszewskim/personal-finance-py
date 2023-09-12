@@ -3,7 +3,6 @@ import src.pf_console.functions.prompt as prompt
 from src.pf_console.objects import budget_line as bl
 import src.pf_console.objects.data_manager as dm
 
-
 class PFConsole(Console):
 
     def __init__(self, saved_transactions_file, saved_budget_lines_file, new_statement_file):

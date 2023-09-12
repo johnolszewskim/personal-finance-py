@@ -55,6 +55,7 @@
   </subcategory>
   <subcategory name="Haircuts">
   </subcategory>
+  <subcategory name="]Laundry"/>
  </category>
  <category budget="Daily_Living" name="Transportation">
   <subcategory name="Rideshare">
@@ -93,6 +94,7 @@
   </subcategory>
   <subcategory name="Sloan">
   </subcategory>
+  <subcategory name="Borrowed Vehicle"/>
  </category>
  <category budget="Auto" name="Tolls/Fees">
   <subcategory name="Parking Ticket">
@@ -257,6 +259,7 @@
   </subcategory>
   <subcategory name="Meal">
   </subcategory>
+  <subcategory name="Community Group"/>
  </category>
  <category budget="Luxuries" name="Travel">
   <subcategory name="Souvenirs">
@@ -273,5 +276,8 @@
   </subcategory>
  </category>
  <category budget="Unknown" name="Unknown">
+ </category>
+ <category budget="Luxuries" name="DIY">
+  <subcategory name="Supplies"/>
  </category>
 </categories>

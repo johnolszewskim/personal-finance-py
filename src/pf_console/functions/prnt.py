@@ -31,7 +31,7 @@ def print_splits(splits, statement_index, statement_length, bl_index, mark_index
 
 def print_categories(console) -> []:
 
-    lines = ['','','','','','','','','','']
+    lines = ['','','','','','','','','','','']
     categories = []
 
     print()

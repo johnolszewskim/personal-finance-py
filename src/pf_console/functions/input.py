@@ -32,8 +32,8 @@ def input_vendor_name(console, splits):
 def input_vendor_from_list(console, splits):
 
     os.system('clear')
-    vendor_dict = console.dm.get_vendor_dict()
-    vendor_set = sorted(set(vendor_dict.values()))
+    # vendor_dict = console.dm.get_vendor_dict()
+    vendor_set = sorted(console.dm.df_raw_vendor_to_vendor['vendor'].values.tolist())
 
     print()
     for index, v in enumerate(vendor_set):

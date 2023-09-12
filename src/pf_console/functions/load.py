@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import src.pf_console.datasets as datasets
+import pandas as pd
 
 
 def load_categories(data_manager) -> {}:
@@ -11,7 +12,6 @@ def load_categories(data_manager) -> {}:
     categories = data_manager.data_categories.find_all('category')
 
     for c in categories:
-
         cat = c['name']
         data_manager.dict_categories_subcategories[cat] = []
         subcategories = c.find_all('subcategory')
@@ -25,3 +25,25 @@ def load_categories(data_manager) -> {}:
         else:
             data_manager.dict_budget_categories[b] = data_manager.dict_budget_categories[b] + [cat]
 
+def load_raw_vendor_to_vendor() -> pd.DataFrame:
+
+    try:
+        result = pd.read_csv(datasets.get_raw_vendor_to_vendor(), index_col=['index'])
+
+    except Exception:
+
+        result = pd.DataFrame(columns=['raw_vendor', 'vendor'])
+
+    return result
+
+
+def load_csv(file_name, new_columns) -> pd.DataFrame:
+    try:
+        result = pd.read_csv(file_name, header=0, index_col=['index'])
+        result = result.fillna('')
+
+    except Exception:
+
+        result = pd.DataFrame(columns=new_columns)
+
+    return result

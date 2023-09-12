@@ -3,6 +3,7 @@ import calendar
 import src.pf_console.functions.prnt as prnt
 import src.pf_console.functions.input as inpt
 import src.pf_console.functions.suggest as sggst
+import src.pf_console.functions.save as sv
 
 
 def prompt_account(df_accounts) -> str:
@@ -13,8 +14,8 @@ def prompt_account(df_accounts) -> str:
         for i, k in df_accounts.iterrows():
             print(f'{str(i):>7}' + ': ' + k.Name)
 
-        # input_acct = input('\nSelect account: ')
-        input_acct = '22009'
+        input_acct = input('\nSelect account: ')
+        # input_acct = '22009'
 
         if not input_acct.isdigit():
             continue
@@ -300,7 +301,7 @@ def prompt_save(console, splits):
     print()
 
     if inpt.did_input_yes(console, splits, 'Save?'):
-        console.dm.save_splits(console, splits)
+        sv.save_splits(console.dm, console, splits)
 
     return
 
