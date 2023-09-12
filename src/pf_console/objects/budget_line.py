@@ -40,4 +40,3 @@ class BudgetLine:
     def adjust_transaction_ids_for_splits(splits: []):
         for index, bl in enumerate(splits):
             bl.transaction_id = bl.transaction_id[0:-2] + '_' + str(index)
-
