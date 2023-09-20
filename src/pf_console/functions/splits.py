@@ -7,7 +7,7 @@ def split_bl(console, splits, amount):
         splits[console.bl_index].amount = splits[console.bl_index].amount + amount
 
     reindex_splits(splits)
-    console.rerun(splits)
+    return
 
 
 def reindex_splits(splits):

@@ -110,16 +110,17 @@ def prompt_vendor(console, splits):
     # input("prompt_vendor()") # for testing
 
     if sggst.did_accept_suggested_vendor(console, splits):
-        return console.next(splits, to_func_index=console.functions.index(prompt_category))
+        return prompt_category
 
     while True:
         os.system('clear')
         prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
 
-        i = inpt.input_vendor_name(console, splits)
-        splits[console.bl_index].vendor = i
+        did_assign_vendor = inpt.input_vendor_name(console, splits)
+        if not did_assign_vendor:
+            continue
 
-        return console.next(splits, to_func_index=console.functions.index(prompt_category))
+        return prompt_category
 
 
 def prompt_category(console, splits):
@@ -129,6 +130,8 @@ def prompt_category(console, splits):
     will_suggest = True
 
     while True:
+
+        #  TODO//rework suggestion to be more like vendor, hiding in prnt.py
 
         os.system('clear')
         suggestion_index = sggst.suggest_category(console, splits, last_index=suggestion_index)
@@ -152,14 +155,14 @@ def prompt_category(console, splits):
         if category_index is None:  # user hit enter
             if splits[console.bl_index].category == '':
                 continue
-            return console.next(splits, to_func_index=console.functions.index(prompt_subcategory))
+            return prompt_subcategory
         elif category_index == '99':  # add new category
-            return console.next(splits, to_func_index=console.functions.index(prompt_add_category))
+            return prompt_add_category
         elif category_index == 'n':  # n is returned as input
             continue
         else:  # if category is selected by index
             splits[console.bl_index].category = all_categories[category_index]
-            return console.next(splits, to_func_index=console.functions.index(prompt_subcategory))
+            return prompt_subcategory
 
 
 def prompt_add_category(console, splits):
@@ -167,18 +170,21 @@ def prompt_add_category(console, splits):
 
         os.system('clear')
         prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
-        all_categories = prnt.print_categories(console.dm)
+        all_categories = prnt.print_categories(console.dm) # value unused
         print('99: RETURN TO CHOOSE CATEGORY\n')
 
         new_category_name = inpt.get_custom_input(console, splits, message='Input new category name: ',
                                                   special_cases=['99'])
 
         #if not new_category name # user hit enter
-        # check to make sure theres a category before accepting enter
+
+        if new_category_name is None:
+            continue
         if new_category_name == '99':
-            return console.next(splits, to_func_index=console.functions.index(prompt_category))
+            splits[console.bl_index].category = ''
+            return prompt_category
         splits[console.bl_index].category = new_category_name
-        return console.next(splits, to_func_index=console.functions.index(prompt_subcategory))
+        return prompt_subcategory
 
 
 def prompt_subcategory(console, splits):
@@ -200,7 +206,7 @@ def prompt_subcategory(console, splits):
         subcategories = prnt.print_subcategories(console, splits[console.bl_index].category)
 
         if not subcategories:
-            return console.next(splits, to_func_index=console.functions.index(prompt_add_subcategory))
+            return prompt_add_subcategory
 
         print('88: ADD SUBCATEGORY')
         print('99: REINPUT CATEGORY')
@@ -218,16 +224,17 @@ def prompt_subcategory(console, splits):
         if subcategory_index is None:
             if splits[console.bl_index].subcategory == '':
                 continue
-            return console.next(splits, to_func_index=console.functions.index(prompt_amount))
+            return prompt_amount
         elif subcategory_index == '88':
-            return console.next(splits, to_func_index=console.functions.index(prompt_add_subcategory))
+            return prompt_add_subcategory
         elif subcategory_index == '99':
-            return console.next(splits, to_func_index=console.functions.index(prompt_category))
+            splits[console.bl_index].category = ''
+            return prompt_category
         elif subcategory_index == 'n':
             continue
         else:
             splits[console.bl_index].subcategory = subcategories[subcategory_index]
-            return console.next(splits, to_func_index=console.functions.index(prompt_amount))
+            return prompt_amount
 
 
 def prompt_add_subcategory(console, splits):
@@ -241,12 +248,13 @@ def prompt_add_subcategory(console, splits):
         new_subcategory_name = inpt.get_custom_input(console, splits, message='Input new subcategory name: ',
                                                      special_cases=['99'])
 
-        #if not new_category name # user hit enter
-        # check to make sure theres a category before accepting enter
+        if new_subcategory_name is None:
+            continue
         if new_subcategory_name == '99':
-            return console.next(splits, to_func_index=console.functions.index(prompt_category))
+            splits[console.bl_index].category = ''
+            return prompt_category
         splits[console.bl_index].subcategory = new_subcategory_name
-        return console.next(splits, to_func_index=console.functions.index(prompt_amount))
+        return prompt_amount
 
 
 def prompt_amount(console, splits):
@@ -254,8 +262,11 @@ def prompt_amount(console, splits):
         os.system('clear')
         prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)
         print()
-        input_amount = inpt.input_amount(console, splits, special_cases=['-', '+'])
-        return console.next(splits, to_func_index=console.functions.index(prompt_tag))
+        didSplit = inpt.input_amount(console, splits, special_cases=['-', '+'])
+        if didSplit:
+            continue
+        else:
+            return prompt_tag
 
 
 def prompt_tag(console, splits):

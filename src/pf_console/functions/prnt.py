@@ -20,13 +20,13 @@ def print_splits(splits, statement_index, statement_length, bl_index, mark_index
                 print('-' + str(b_l))
             else:
                 print(Fore.WHITE + ' ' + str(b_l) + Style.RESET_ALL)
-
     else:
         for i, b_l in enumerate(splits):
             if i == bl_index:
                 print('-' + str(b_l))
             else:
                 print(' ' + str(b_l))
+    return
 
 
 def print_categories(console) -> []:

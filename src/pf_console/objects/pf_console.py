@@ -3,6 +3,7 @@ import src.pf_console.functions.prompt as prompt
 from src.pf_console.objects import budget_line as bl
 import src.pf_console.objects.data_manager as dm
 
+
 class PFConsole(Console):
 
     def __init__(self, saved_transactions_file, saved_budget_lines_file, new_statement_file):
@@ -60,6 +61,33 @@ class PFConsole(Console):
                 self.functions[self.func_index](self, [temp_bl])
                 input("FINISHED ONE")
 
+    def runFrom(self, func):
+        """
+
+        :param at_func_index:
+        :return:
+        """
+
+        self.statement_length = len(self.new_transactions)
+
+        for i, tx in self.new_transactions.iterrows():
+
+            self.statement_index = i
+            self.importing_tx = tx
+
+            # check to see if tx has been imported
+            temp_bl = self.filter(i, tx)
+
+            # reset instance variables for new import
+            self.bl_index = 0
+            self.func_index = 0
+
+            # if tx had already been imported, temp_bl would be None
+            if temp_bl is not None:
+                next_func = func
+                while next_func is not None:
+                    next_func = next_func(self, [temp_bl])
+
     def next(self, splits, to_func_index=-1):
 
         if to_func_index != -1:  # reserved for exiting
@@ -103,3 +131,6 @@ class PFConsole(Console):
 
         else:
             return None
+
+
+

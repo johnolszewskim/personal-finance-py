@@ -1,3 +1,4 @@
+import src.pf_console.objects.pf_console
 from src.pf_console.objects import pf_console as pfc
 
 '''
@@ -23,11 +24,12 @@ the new transaction.
 '''
 SAVED_TRANSACTIONS_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/TRANSACTIONS_PersonalFinancePY.csv'
 SAVED_BUDGET_LINES_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/0. PersonalFinancePY/BUDGET_LINES_PersonalFinancePY.csv'
-STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/AMEX Gold Card 63002/2023/9. 2023-09-01.csv'
+STATEMENT_FILE = '/Users/johnmatthew/Documents/6. Personal Finance/3. Credit Card Statements/CHASE Freedom Unlimited 3387/2023/8. Chase3387_Activity20230709_20230808_20230912.CSV'
 
 # STATEMENT_FILE = fd.askopenfilename()
 
 c = pfc.PFConsole(SAVED_TRANSACTIONS_FILE, SAVED_BUDGET_LINES_FILE, STATEMENT_FILE)
-c.run()
+c.runFrom(src.pf_console.functions.prompt.prompt_vendor)  # new
+# c.run()
 
 print('ALL TRANSACTIONS IMPORTED.')

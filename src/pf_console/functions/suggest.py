@@ -12,7 +12,7 @@ def did_accept_suggested_vendor(console, splits):
     matching_vendors.reset_index(drop=True, inplace=True)
 
     if len(matching_vendors) == 0:
-        return
+        return False
 
     os.system('clear')
     prnt.print_splits(splits, console.statement_index, console.statement_length, console.bl_index)

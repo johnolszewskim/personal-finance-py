@@ -16,20 +16,23 @@ def did_input_yes(console, splits, message='') -> bool:
             return False
 
 
-def input_vendor_name(console, splits):
+def input_vendor_name(console, splits) -> bool:
 
     i = input('\nInput vendor. ENTER to keep. -v for vendor list: ').strip()
 
     if i == '':
-        i = splits[console.bl_index].vendor
+        # i = splits[console.bl_index].vendor
+        return True  # indicating assigned (KEPT ORIGINAL)
     if i == '-v':
-        input_vendor_from_list(console, splits)
-    elif str.startswith(i, '-'):
-        check_input_for_commands(i, console, splits)
-    return i
+        return input_vendor_from_list(console, splits)  # indicating result of input_vendor_from_list
+    # elif str.startswith(i, '-'):
+    #     check_input_for_commands(i, console, splits)
+    else:
+        splits[console.bl_index].vendor = i
+        return True
 
 
-def input_vendor_from_list(console, splits):
+def input_vendor_from_list(console, splits) -> bool:
 
     os.system('clear')
     # vendor_dict = console.dm.get_vendor_dict()
@@ -40,10 +43,10 @@ def input_vendor_from_list(console, splits):
         print(str(index) + '. ' + v)
     response = input('ENTER to input vendor.')
     if response == '':
-        return console.rerun(splits)
+        return False  # to_vendor_name
     elif response.isdigit():  # pick vendor from list
         splits[console.bl_index].vendor = list(vendor_set)[int(response)]
-        return console.next(splits)
+        return True  # to_vendor_name
 
 
 def check_input_for_commands(response, console, splits): # new
@@ -102,15 +105,15 @@ def get_custom_input(console, splits, message='Input: ', special_cases=[]) -> st
         return response
 
 
-def input_amount(console, splits, message='ENTER to accept, \'-\'(item amount), \'+\'(credit amount): $ ', special_cases=[]):
+def input_amount(console, splits, message='ENTER to accept, \'-\'(item amount), \'+\'(credit amount): $ ', special_cases=[]) -> bool:
 
     while True:
         response_str = input(message)
 
         if response_str == '':
-            return
-        if str.startswith(response_str, '-'):
-            check_input_for_commands(response_str, console, splits)
+            return False
+        # if str.startswith(response_str, '-'):
+        #     check_input_for_commands(response_str, console, splits)
         try:
             response_flt = float(response_str)
         except:
@@ -122,9 +125,10 @@ def input_amount(console, splits, message='ENTER to accept, \'-\'(item amount), 
 
         if response_str.startswith(('-','+')):
             splt.split_bl(console, splits, response_flt)
+            return True
         else:
             splits[console.bl_index].amount = response_flt
-            return
+            return False
 
 def input1():
     input('in input1()')
